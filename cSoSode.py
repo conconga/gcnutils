@@ -69,20 +69,25 @@ class cSOSODE_FUNCTION:
 ##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
 
 class cSOSODE:
-    def __init__(self, *fn_objs, reverse=False):
+
+    def __init__(self, *fn_objs, reverse=False, order_states=None):
         """
         Use:
-            reverse  :  True if input order will be (y,t) instead of (t,y)
+            reverse      :  True if input order will be (y,t) instead of (t,y)
+            order_states :  list with the order of states in the state vector.
         """
 
-        self.list_fn = []
-        self.reverse = reverse
+        self.list_fn      = []
+        self.reverse      = reverse
+        self.order_states = order_states
 
         for i in fn_objs:
             self.register(i)
 
+
     def register(self, function):
         self.list_fn.append(function)
+
 
     def showregisteredfunctions(self):
         print()
@@ -92,6 +97,7 @@ class cSOSODE:
             print("     input params: {:s}".format(j.i_param.__str__()))
             print("    output states: {:s}".format(j.o_state.__str__()))
             print("    output params: {:s}".format(j.o_param.__str__()))
+
 
     def create_nets(self):
 
@@ -123,6 +129,10 @@ class cSOSODE:
             t      = args[0]
             state  = args[1]
 
+        if False:
+            print('states(t={:f}) ='.format(t))
+            print(state)
+
         params = self._calc_all_parameters(t)
         return self._calc_all_ddtstates(t, state, params)
 
@@ -132,6 +142,10 @@ class cSOSODE:
         self.list_of_inputs  = list( set( sum( [i.i_state + i.i_param for i in self.list_fn ], [] ) ) )
         self.list_of_params  = list( set( sum( [i.i_param + i.o_param for i in self.list_fn ], [] ) ) )
         self.list_of_states  = list( set( sum( [i.i_state + i.o_state for i in self.list_fn ], [] ) ) )
+
+        if self.order_states is not None:
+            if set(self.list_of_states) == set(self.order_states):
+                self.list_of_states = self.order_states
 
 
     def _who_calcs_param(self, param):
@@ -473,7 +487,11 @@ class cSOSODE:
             elif net[idx]['cmd'] == 'save result':
                 count = net[idx]['count']
                 for i in range(count):
-                    ret[ net[idx+i+1]['idx_param'] ] = fn_out[i]
+                    if hasattr(fn_out, '__iter__'):
+                        ret[ net[idx+i+1]['idx_param'] ] = fn_out[i]
+                    else:
+                        ret[ net[idx+i+1]['idx_param'] ] = fn_out
+
 
                 idx += net[idx]['count'] + 1
 
@@ -528,7 +546,9 @@ class cSOSODE:
 
 if __name__ == "__main__":
 
-    import numpy as np
+    import numpy            as np
+    import scipy.integrate  as Int
+    import matplotlib.pylab as plt
 
     def f1(y, t, PARAM):
         tta1 = PARAM[0]
@@ -723,8 +743,57 @@ if __name__ == "__main__":
         if j != k:
             print("ERROR calculating the ddt_states since {:s} != {:s}".format(j.__str__(), k.__str__()))
 
+    # test calculation of parameters:
+    print()
+    print("--  TEST FULL SYSTEM  --")
+
+    # from:
+    #   http://support.ptc.com/help/mathcad/en/index.html#page/PTC_Mathcad_Help/example_solving_a_first_order_system_of_ODEs.html
+
+    def tta(t):
+        return 8 if t < 10 else -2
+
+    def eq0(t, y, *args):
+        tta = args[0]
+        return (-8.*y[0]) + (tta*y[1])
+
+    def eq1(t, y):
+        return (30*y[0]) + y[1] - (y[0]*y[2])
+
+    def eq2(t, y):
+        return (y[0]*y[1]) - (8.*y[2]/3)
+
+    fn0 = cSOSODE_FUNCTION(eq0)
+    fn0.set_i_state([ 'y0', 'y1' ])
+    fn0.set_i_param([ 'tta' ])
+    fn0.set_o_state([ 'y0' ])
+
+    fn1 = cSOSODE_FUNCTION(eq1)
+    fn1.set_i_state([ 'y0', 'y1', 'y2' ])
+    fn1.set_o_state([ 'y1' ])
+
+    fn2 = cSOSODE_FUNCTION(eq2)
+    fn2.set_i_state([ 'y0', 'y1', 'y2' ])
+    fn2.set_o_state([ 'y2' ])
+
+    g0 = cSOSODE_FUNCTION(tta)
+    g0.set_o_param([ 'tta' ])
+
+    b = cSOSODE( fn0, fn1, fn2, g0, reverse=True, order_states= [ 'y0', 'y1', 'y2' ] )
+    b.create_nets()
+    b.showregisteredfunctions()
+
+    T = np.linspace(0,12.0,1000)
+    R = Int.odeint(b, [-1, 0, 1], T, args=() )
+
     print()
     print("DONE.")
 
+    # figure:
+    fig = plt.figure(0).clf()
+    ax  = plt.subplot(1,1,1)
+    ax.plot(T, R)
+    ax.grid(True)
+    plt.show(block=False)
 
 ##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ###@@##@@##@ @#@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
