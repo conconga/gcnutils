@@ -140,6 +140,7 @@ class k2OrderLTIsysSisoContinuous (kCommon2OrderLTIsysSiso):
             _,y = odeint(self._dstate_dt, self.get_state(), [t0, t], (u,))
             self.curr_t = t
 
+            self.x  = np.asarray(y)
             self.x1 = y[0]
             self.x2 = y[1]
 
@@ -157,9 +158,9 @@ class k2OrderLTIsysSisoDiscrete (kCommon2OrderLTIsysSiso):
             self.Bc  = np.asarray([0,a])
 
             # bilinear:
-            aux      = np.linalg.inv(np.eye(2) - (0.5*Ts*self.Ac))
-            self.Ad  = dot(np.eye(2) + (0.5*Ts*self.Ac), aux)
-            self.Bd  = dot(aux, self.Bc) * Ts
+            aux      = np.linalg.inv(np.eye(2) - (0.5*self.Ts*self.Ac))
+            self.Ad  = dot(np.eye(2) + (0.5*self.Ts*self.Ac), aux)
+            self.Bd  = dot(aux, self.Bc) * self.Ts
 
     def _d_update(self, t, u):
         """
