@@ -4,7 +4,7 @@
 """
 Datei: 
 Beschreibung: These classes implement the dynamical behaviour of a second order
-    LTI system either SISO and saturated in input and output rate.
+    LTI system SISO and saturated in input and output rate.
 Autor: Luciano Auguto Kruk
 Erstellt am: 27.09.2025
 Version: 1.0.0
@@ -16,6 +16,7 @@ GitHub:
 import numpy           as np
 from   numpy           import dot
 from   numpy           import inf
+from   scipy.integrate import odeint
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 #                                                                                  #
@@ -50,7 +51,7 @@ class kCommon2OrderLTIsysSiso:
         # this class shall not be instanciated.
         assert "kCommon2OrderLTIsysSiso" not in str(self.__class__)
 
-        if (isinstance(x0, int) or isinstance(x0, float)):
+        if isinstance(x0, (int, float, np.int64)):
             x0 = np.asarray([x0, 0])
 
         if (len(x0) == 1):
@@ -281,7 +282,6 @@ class k2OrderLTIsysSiso (k2OrderLTIsysSisoContinuous, k2OrderLTIsysSisoDiscrete)
 #################################
 if (__name__ == "__main__"):
 
-    from   scipy.integrate    import odeint
     import matplotlib.pyplot  as plt
 
     qsi = 0.5
