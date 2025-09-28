@@ -4,15 +4,24 @@
     -   [<span class="toc-section-number">2.1</span>
         k2OrderLTIsysSiso](#k2orderltisyssiso)
         -   [<span class="toc-section-number">2.1.1</span> to create a
-            continuous LTI system:](#to-create-a-continuous-lti-system)
--   [<span class="toc-section-number">3</span> ](#section)
-    -   [<span class="toc-section-number">3.0.1</span> to create a
-        discrete LTI system:](#to-create-a-discrete-lti-system)
-    -   [<span class="toc-section-number">3.0.2</span> to update the
-        systems:](#to-update-the-systems)
-    -   [<span class="toc-section-number">3.1</span>
+            SISO continuous 2-order LTI
+            system:](#to-create-a-siso-continuous-2-order-lti-system)
+        -   [<span class="toc-section-number">2.1.2</span> to create a
+            SISO discrete 2-order LTI
+            system:](#to-create-a-siso-discrete-2-order-lti-system)
+        -   [<span class="toc-section-number">2.1.3</span> to update the
+            systems:](#to-update-the-systems)
+    -   [<span class="toc-section-number">2.2</span>
         k2OrderLTIsysMimo](#k2orderltisysmimo)
--   [<span class="toc-section-number">4</span> How to use](#how-to-use)
+        -   [<span class="toc-section-number">2.2.1</span> to create a
+            MIMO continuous 2-order LTI
+            system:](#to-create-a-mimo-continuous-2-order-lti-system)
+        -   [<span class="toc-section-number">2.2.2</span> to create a
+            MIMO discrete 2-order LTI
+            system:](#to-create-a-mimo-discrete-2-order-lti-system)
+        -   [<span class="toc-section-number">2.2.3</span> to update the
+            systems:](#to-update-the-systems-1)
+-   [<span class="toc-section-number">3</span> How to use](#how-to-use)
 
 # Introduction
 
@@ -34,11 +43,11 @@ There is one object of the filter as SISO, and another as MIMO.
 
 ## k2OrderLTIsysSiso
 
-### to create a continuous LTI system:
+### to create a SISO continuous 2-order LTI system:
 
         qsi      : damping factor        
         wn       : [rad/s] natural freq.
-        x0       : initial state       
+        x0       : initial state : scalar or 2D
         min_dxdt : min rate slope
         max_dxdt : max rate slope
         min_x    : min output   
@@ -46,13 +55,11 @@ There is one object of the filter as SISO, and another as MIMO.
 
         lti_continuous = k2OrderLTIsysSiso (self, qsi, wn, x0, min_dxdt, max_dxdt, min_x, max_x, Ts=0)
 
-# 
-
-### to create a discrete LTI system:
+### to create a SISO discrete 2-order LTI system:
 
         qsi      : damping factor        
         wn       : [rad/s] natural freq.
-        x0       : initial state       
+        x0       : initial state : scalar or 2D
         min_dxdt : min rate slope
         max_dxdt : max rate slope
         min_x    : min output   
@@ -70,6 +77,39 @@ There is one object of the filter as SISO, and another as MIMO.
         lti_discrete.update(t,u)
 
 ## k2OrderLTIsysMimo
+
+### to create a MIMO continuous 2-order LTI system:
+
+        qsi      : damping factor         : scalar
+        wn       : [rad/s] natural freq.  : scalar
+        x0       : initial state          : N=len(x0) is the length of inputs and outputs of the MIMO system
+        min_dxdt : min rate slope         : scalar, list[N], vector[N]
+        max_dxdt : max rate slope         : scalar, list[N], vector[N]
+        min_x    : min output             : scalar, list[N], vector[N]
+        max_x    : max output             : scalar, list[N], vector[N]
+
+        ltimimo_continuous = k2OrderLTIsysMimo (self, qsi, wn, x0, min_dxdt, max_dxdt, min_x, max_x, Ts=0)
+
+### to create a MIMO discrete 2-order LTI system:
+
+        qsi      : damping factor         : scalar
+        wn       : [rad/s] natural freq.  : scalar
+        x0       : initial state          : N=len(x0) is the length of inputs and outputs of the MIMO system
+        min_dxdt : min rate slope         : scalar, list[N], vector[N]
+        max_dxdt : max rate slope         : scalar, list[N], vector[N]
+        min_x    : min output             : scalar, list[N], vector[N]
+        max_x    : max output             : scalar, list[N], vector[N]
+        Ts       : sampling frequency
+
+        ltimimo_discrete = k2OrderLTIsysMimo (self, qsi, wn, x0, min_dxdt, max_dxdt, min_x, max_x, Ts=Ts)
+
+### to update the systems:
+
+        t : update up to this time (only continuous, not used for the discrete)
+        u : input of the system
+
+        ltimimo_continuous.update(t,u)
+        ltimimo_discrete.update(t,u)
 
 # How to use
 

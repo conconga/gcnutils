@@ -17,11 +17,11 @@ There is one object of the filter as SISO, and another as MIMO.
 
 ## k2OrderLTIsysSiso
 
-### to create a continuous LTI system:
+### to create a SISO continuous 2-order LTI system:
 ```
     qsi      : damping factor        
     wn       : [rad/s] natural freq.
-    x0       : initial state       
+    x0       : initial state : scalar or 2D
     min_dxdt : min rate slope
     max_dxdt : max rate slope
     min_x    : min output   
@@ -29,12 +29,11 @@ There is one object of the filter as SISO, and another as MIMO.
 
     lti_continuous = k2OrderLTIsysSiso (self, qsi, wn, x0, min_dxdt, max_dxdt, min_x, max_x, Ts=0)
 ```
-#
-### to create a discrete LTI system:
+### to create a SISO discrete 2-order LTI system:
 ```
     qsi      : damping factor        
     wn       : [rad/s] natural freq.
-    x0       : initial state       
+    x0       : initial state : scalar or 2D
     min_dxdt : min rate slope
     max_dxdt : max rate slope
     min_x    : min output   
@@ -54,6 +53,41 @@ There is one object of the filter as SISO, and another as MIMO.
 ```
 
 ## k2OrderLTIsysMimo
+
+### to create a MIMO continuous 2-order LTI system:
+```
+    qsi      : damping factor         : scalar
+    wn       : [rad/s] natural freq.  : scalar
+    x0       : initial state          : N=len(x0) is the length of inputs and outputs of the MIMO system
+    min_dxdt : min rate slope         : scalar, list[N], vector[N]
+    max_dxdt : max rate slope         : scalar, list[N], vector[N]
+    min_x    : min output             : scalar, list[N], vector[N]
+    max_x    : max output             : scalar, list[N], vector[N]
+
+    ltimimo_continuous = k2OrderLTIsysMimo (self, qsi, wn, x0, min_dxdt, max_dxdt, min_x, max_x, Ts=0)
+```
+### to create a MIMO discrete 2-order LTI system:
+```
+    qsi      : damping factor         : scalar
+    wn       : [rad/s] natural freq.  : scalar
+    x0       : initial state          : N=len(x0) is the length of inputs and outputs of the MIMO system
+    min_dxdt : min rate slope         : scalar, list[N], vector[N]
+    max_dxdt : max rate slope         : scalar, list[N], vector[N]
+    min_x    : min output             : scalar, list[N], vector[N]
+    max_x    : max output             : scalar, list[N], vector[N]
+    Ts       : sampling frequency
+
+    ltimimo_discrete = k2OrderLTIsysMimo (self, qsi, wn, x0, min_dxdt, max_dxdt, min_x, max_x, Ts=Ts)
+```
+
+### to update the systems:
+```
+    t : update up to this time (only continuous, not used for the discrete)
+    u : input of the system
+
+    ltimimo_continuous.update(t,u)
+    ltimimo_discrete.update(t,u)
+```
 
 # How to use
 ```
