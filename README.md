@@ -114,5 +114,5 @@ There is one object of the filter as SISO, and another as MIMO.
 # How to use
 
         import sys
-        sys.path.append(< up to where folder karraynav is >)
-        from karraynav import kArrayNav
+        sys.path.append(< up to where folder kltisystems is >)
+        from kltisystems import k2OrderLTIsysSiso, k2OrderLTIsysMimo
