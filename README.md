@@ -23,9 +23,10 @@ The filters can be used in discrete time as much as continuous.
 
 There is one object of the filter as SISO, and another as MIMO.
 
-\|——\|———————————–\| \|SISO \| Single-Input / Single-Output \|
-\|——\|———————————–\| \|MIMO \| Multiple-Input / Multiple-Output \|
-\|——\|———————————–\|
+| type | description                      |
+|:----:|:---------------------------------|
+| SISO | Single-Input / Single-Output     |
+| MIMO | Multiple-Input / Multiple-Output |
 
 # Classes
 
