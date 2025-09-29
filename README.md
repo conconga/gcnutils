@@ -11,6 +11,8 @@
             system:](#to-create-a-siso-discrete-2-order-lti-system)
         -   [<span class="toc-section-number">2.1.3</span> to update the
             systems:](#to-update-the-systems)
+        -   [<span class="toc-section-number">2.1.4</span> to get the
+            current state:](#to-get-the-current-state)
     -   [<span class="toc-section-number">2.2</span>
         k2OrderLTIsysMimo](#k2orderltisysmimo)
         -   [<span class="toc-section-number">2.2.1</span> to create a
@@ -21,14 +23,15 @@
             system:](#to-create-a-mimo-discrete-2-order-lti-system)
         -   [<span class="toc-section-number">2.2.3</span> to update the
             systems:](#to-update-the-systems-1)
+        -   [<span class="toc-section-number">2.2.4</span> to get the
+            current state:](#to-get-the-current-state-1)
 -   [<span class="toc-section-number">3</span> How to use](#how-to-use)
 
 # Introduction
 
 This package contains 2-order filters to follow inputs and calculate the
-first derivative of the filtered-output.
-
-The filters can be used in discrete time as much as continuous.
+first derivative of the filtered-output. The filters can be used in
+discrete time as much as continuous.
 
 There is one object of the filter as SISO, and another as MIMO.
 
@@ -76,6 +79,10 @@ There is one object of the filter as SISO, and another as MIMO.
         lti_continuous.update(t,u)
         lti_discrete.update(t,u)
 
+### to get the current state:
+
+        out, dout_dt = lti.get_state()
+
 ## k2OrderLTIsysMimo
 
 ### to create a MIMO continuous 2-order LTI system:
@@ -110,6 +117,10 @@ There is one object of the filter as SISO, and another as MIMO.
 
         ltimimo_continuous.update(t,u)
         ltimimo_discrete.update(t,u)
+
+### to get the current state:
+
+        out, dout_dt = lti.get_state()
 
 # How to use
 

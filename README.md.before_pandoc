@@ -1,9 +1,8 @@
 # Introduction
 
-This package contains 2-order filters to follow inputs and calculate the
-first derivative of the filtered-output.
-
-The filters can be used in discrete time as much as continuous.
+This package contains 2-order filters to follow inputs and calculate the first
+derivative of the filtered-output. The filters can be used in discrete time as
+much as continuous.
 
 There is one object of the filter as SISO, and another as MIMO.
 
@@ -52,6 +51,11 @@ There is one object of the filter as SISO, and another as MIMO.
     lti_discrete.update(t,u)
 ```
 
+### to get the current state:
+```
+    out, dout_dt = lti.get_state()
+```
+
 ## k2OrderLTIsysMimo
 
 ### to create a MIMO continuous 2-order LTI system:
@@ -87,6 +91,11 @@ There is one object of the filter as SISO, and another as MIMO.
 
     ltimimo_continuous.update(t,u)
     ltimimo_discrete.update(t,u)
+```
+
+### to get the current state:
+```
+    out, dout_dt = lti.get_state()
 ```
 
 # How to use
