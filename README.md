@@ -25,6 +25,13 @@
             systems:](#to-update-the-systems-1)
         -   [<span class="toc-section-number">2.2.4</span> to get the
             current state:](#to-get-the-current-state-1)
+    -   [<span class="toc-section-number">2.3</span>
+        kNOrderDerivativeSiso](#knorderderivativesiso)
+        -   [<span class="toc-section-number">2.3.1</span> to create a
+            system (filter):](#to-create-a-system-filter)
+        -   [<span class="toc-section-number">2.3.2</span> to update the
+            inputs and get new
+            outputs:](#to-update-the-inputs-and-get-new-outputs)
 -   [<span class="toc-section-number">3</span> How to use](#how-to-use)
 
 # Introduction
@@ -122,8 +129,25 @@ There is one object of the filter as SISO, and another as MIMO.
 
         out, dout_dt = lti.get_state()
 
+## kNOrderDerivativeSiso
+
+### to create a system (filter):
+
+        order =    4 # when we want y, y', y", y'", y""
+        pole  = -100 # fast and stable
+        Ts    =  0.1 # [s]
+        obj   = kNOrderDerivativeSiso( order, pole, Ts )
+
+### to update the inputs and get new outputs:
+
+        out     = obj.update(0.7)
+        y       = out[0]
+        dydt    = out[1]
+        ...
+        d4y/dt4 = out[4]
+
 # How to use
 
         import sys
         sys.path.append(< up to where folder kltisystems is >)
-        from kltisystems import k2OrderLTIsysSiso, k2OrderLTIsysMimo
+        from kltisystems import k2OrderLTIsysSiso, k2OrderLTIsysMimo, kNOrderDerivativeSiso
