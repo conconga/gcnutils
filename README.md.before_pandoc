@@ -1,10 +1,9 @@
 # Introduction
 
-This package contains 2-order filters to follow inputs and calculate the first
-derivative of the filtered-output. The filters can be used in discrete time as
-much as continuous.
-
-There is one object of the filter as SISO, and another as MIMO.
+This package contains filters to calculate the derivative of stochastic
+signals. The 2-order filters allow to limit (up and down) both the output and
+slopes. The N-order filter allow to estimate the derivative of any order fo the
+input signal.
 
 | type  |  description                      |
 | :---: |  :------------------------------- |
