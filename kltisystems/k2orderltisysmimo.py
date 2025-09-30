@@ -15,7 +15,9 @@ GitHub:
 ##WWww=--  import section: --=wwWW##
 import numpy   as np
 from   numpy   import inf
-from   k2orderltisyssiso import k2OrderLTIsysSiso
+
+# as a package, this import happens in the __init__.py:
+#from   k2orderltisyssiso import k2OrderLTIsysSiso
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 #                                                                                  #
