@@ -20,6 +20,21 @@ import scipy.signal     as ss
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 #                                                                                  #
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
+class kSystemBA:
+    def __init__(self, num, den):
+        self.B = num
+        self.A = den
+
+        # initialize the filter:
+        _, self.state = ss.lfilter(self.B, self.A, [0], zi=ss.lfiltic(self.B, self.A, []))
+
+    def update(self, sample):
+        out, self.state = ss.lfilter(self.B, self.A, [sample], zi=self.state)
+        return(out)
+
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
+#                                                                                  #
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 class kNOrderDerivativeSiso:
     """
     This objects smoothes the input signal and calculates its derivatives.
@@ -35,9 +50,63 @@ class kNOrderDerivativeSiso:
         assert pole < 0
         assert Ts > 0
 
-        self.M    = order + 1
-        self.pole = pole
-        self.Ts   = Ts
+        self.order = order
+        self.pole  = pole
+        self.Ts    = Ts
+
+        self._calculate_stable_transfer_function()
+        self.A, self.B, self.D = self._calculate_state_space_matrices()
+        self._setup_systems_for_each_derivative()
+
+    def _calculate_stable_transfer_function(self):
+        # polynomial:
+        den = np.poly1d( [1, -pole] )
+        for i in range(self.order-1):
+            # den = [1 ..  a1 a0]
+            den *= np.poly1d( [1, -pole] )
+        self.den    = list(den) # indexing 'den' is non intuitive
+        self.revden = self.den[::-1] # reversing
+
+    def _calculate_state_space_matrices(self):
+        A     = np.hstack( (np.zeros((self.order-1, 1)), np.eye(self.order-1)) )
+        A     = np.vstack( (A, [-i for i in self.revden[:self.order]]) )
+        B     = np.zeros(self.order)
+        B[-1] = self.den[-1]
+        B     = B.reshape((-1,1))
+        D     = 0;
+
+        return A, B, D
+
+    def _setup_systems_for_each_derivative(self):
+        system = list()
+        for i in range(self.order):
+            # when i==0, the system will be a LP filter to smooth the input
+            # signal and enable the calculation of the derivatives.
+            C = np.zeros(order)
+            C[i] = 1.0
+            
+            # setup of discrete systems (filters):
+            sysd = ss.cont2discrete(( self.A, self.B, C, self.D ), self.Ts)
+            b, a = ss.ss2tf(sysd[0], sysd[1], sysd[2], sysd[3])
+            b = b.squeeze() # bug?
+            system.append( kSystemBA( b,a ) )
+
+        self.system = system
+
+    def update(self, sample):
+        """
+        return:
+            out[0] = smoothed input
+            out[1] = first order derivative
+            out[2] = second order derivative
+            ...
+            out[N] = Nth-order derivative
+        """
+        out = list()
+        for sys in self.system:
+            out.append( sys.update(sample) )
+
+        return out
 
 #################################
 ## ##WWww=--  main:  --=wwWW## ##
@@ -46,56 +115,33 @@ if __name__ == "__main__":
 
     import matplotlib.pylab as plt
 
-    pole = -100
+    pole  = -100
     order = 4
-    Fs = 400 # [Hz]
-    Ts = 1./Fs
-    U = list()
+    Fs    = 400 # [Hz]
+    Ts    = 1./Fs
+    obj   = kNOrderDerivativeSiso( 4, -100, Ts )
 
     # time and input signal:
+    U = list()
     for i in range(4):
         v = np.random.randn()
         U.append( [v for i in range(Fs)] )
     U = np.hstack(U)
     T = np.asarray(range(len(U))) * Ts
 
-    # polynomial:
-    den = np.poly1d( [1, -pole] )
-    for i in range(order-1):
-        den *= np.poly1d( [1, -pole] )
-    # den = [1 ..  a1 a0]
-    den  = list(den) # indexing 'den' is non intuitive
-    rden = den[::-1] # reversing
-
-    # system:
-    A = np.hstack( (np.zeros((order-1, 1)), np.eye(order-1)) )
-    A = np.vstack( (A, [-i for i in rden[:order]]) )
-    B = np.zeros(order)
-    B[-1] = den[-1]
-    B = B.reshape((-1,1))
-    D = 0;
-
     plt.figure(1).clf()
     fig,ax = plt.subplots(order, 1, num=1, sharex=True)
     ax[0].plot(T, U)
+
+    # all derivatives:
+    sysOut = list()
+    for i in U:
+        sysOut.append( obj.update(i) )
+    sysOut = np.asarray(sysOut)
+
+    # for the pictures:
     for i in range(order):
-        C = np.zeros(order)
-        C[i] = 1.0
-        sys = ss.lti(A,B,C,D)
-        _, sysOut, _ = ss.lsim(sys, U, T)
-        ax[i].plot(T, sysOut)
-
-        # discrete:
-        sysd = ss.cont2discrete((A,B,C,D), Ts)
-        b, a = ss.ss2tf(sysd[0], sysd[1], sysd[2], sysd[3])
-        b = b.squeeze() # bug?
-        sysOut = list()
-        out, state = ss.lfilter(b, a, [0], zi=ss.lfiltic(b,a,[]))
-        for j in U:
-            out, state = ss.lfilter(b,a, [j], zi=state)
-            sysOut.append(float(out))
-
-        ax[i].plot(T, sysOut)
+        ax[i].plot(T, sysOut[:,i])
         ax[i].grid(True)
 
     plt.show(block=False)
