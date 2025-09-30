@@ -61,16 +61,16 @@ class kNOrderDerivativeSiso:
     def _calculate_stable_transfer_function(self):
         # polynomial:
         den = np.poly1d( [1, -pole] )
-        for i in range(self.order-1):
+        for i in range(self.order):
             # den = [1 ..  a1 a0]
             den *= np.poly1d( [1, -pole] )
         self.den    = list(den) # indexing 'den' is non intuitive
         self.revden = self.den[::-1] # reversing
 
     def _calculate_state_space_matrices(self):
-        A     = np.hstack( (np.zeros((self.order-1, 1)), np.eye(self.order-1)) )
-        A     = np.vstack( (A, [-i for i in self.revden[:self.order]]) )
-        B     = np.zeros(self.order)
+        A     = np.hstack( (np.zeros((self.order, 1)), np.eye(self.order)) )
+        A     = np.vstack( (A, [-i for i in self.revden[:self.order+1]]) )
+        B     = np.zeros(self.order+1)
         B[-1] = self.den[-1]
         B     = B.reshape((-1,1))
         D     = 0;
@@ -79,10 +79,10 @@ class kNOrderDerivativeSiso:
 
     def _setup_systems_for_each_derivative(self):
         system = list()
-        for i in range(self.order):
+        for i in range(self.order+1):
             # when i==0, the system will be a LP filter to smooth the input
             # signal and enable the calculation of the derivatives.
-            C = np.zeros(order)
+            C = np.zeros(order+1)
             C[i] = 1.0
             
             # setup of discrete systems (filters):
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     T = np.asarray(range(len(U))) * Ts
 
     plt.figure(1).clf()
-    fig,ax = plt.subplots(order, 1, num=1, sharex=True)
+    fig,ax = plt.subplots(order+1, 1, num=1, sharex=True)
     ax[0].plot(T, U)
 
     # all derivatives:
@@ -140,7 +140,7 @@ if __name__ == "__main__":
     sysOut = np.asarray(sysOut)
 
     # for the pictures:
-    for i in range(order):
+    for i in range(order+1):
         ax[i].plot(T, sysOut[:,i])
         ax[i].grid(True)
 
