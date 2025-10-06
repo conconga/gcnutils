@@ -62,9 +62,11 @@ $$ \[ y_1, y_3 \]^T = f_1(y,t,\_1,\_2) $$
 
 and
 
-$$ <sub>=</sub> f_2(y,t) $$
+$$ \[ y_2 \\ y_4 \] = f_2(y,t) $$
 
-with: $$ <sub>=</sub> g(y,t) $$
+with:
+
+$$ \[ \_1, \_2 \]^T = g(y,t) $$
 
 The single system of systems is build with:
 

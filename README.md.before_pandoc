@@ -53,11 +53,11 @@ $$ \[ y_1, y_3 \]^T = f_1(y,t,\theta_1,\theta_2) $$
 
 and
 
-$$ \left[ y_2 \\ y_4 \right] ~=~ f_2(y,t) $$
+$$ \[ y_2 \\ y_4 \] = f_2(y,t) $$
 
 with:
 
-$$ \left[ \theta_1 \\ \theta_2 \right] ~=~ g(y,t) $$
+$$ \[ \theta_1, \theta_2 \]^T = g(y,t) $$
 
 The single system of systems is build with:
 ```
