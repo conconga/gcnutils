@@ -39,10 +39,9 @@
 #     The handler to the global d_y/dt is provided by get_globalf().                     @
 #                                                                                        @
 ##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ###@@##@@##@ @#@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
-
-##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
-
-class cSOSODE_FUNCTION:
+##>>                                                                                  <<##
+##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ###@@##@@##@ @#@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
+class kSosodeFunction:
     def __init__(self, handler):
         self.handler = handler
 
@@ -66,9 +65,10 @@ class cSOSODE_FUNCTION:
     def __call__(self, *args):
         return self.handler(*args)
 
-##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
-
-class cSOSODE:
+##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ###@@##@@##@ @#@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
+##>>                                                                                  <<##
+##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ###@@##@@##@ @#@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
+class kSosode:
 
     def __init__(self, *fn_objs, reverse=False, order_states=None):
         """
@@ -537,11 +537,8 @@ class cSOSODE:
         return val_ddtstates
 
 
-##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
-##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
-##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
-##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
-
+##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ###@@##@@##@ @#@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
+##>>                                                                                  <<##
 ##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ###@@##@@##@ @#@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
 
 if __name__ == "__main__":
@@ -579,16 +576,16 @@ if __name__ == "__main__":
 
     ##@@##@@##@@ ##@@##@@##@@
 
-    fn1 = cSOSODE_FUNCTION(f1)
+    fn1 = kSosodeFunction(f1)
     fn1.set_i_state([ "y 1", "y 2", "y 3", "y 4" ])
     fn1.set_i_param([ "theta 1", "theta 2" ])
     fn1.set_o_state([ "y 1", "y 3" ])
 
-    fn2 = cSOSODE_FUNCTION(f2)
+    fn2 = kSosodeFunction(f2)
     fn2.set_i_state([ "y 1", "y 2", "y 3", "y 4" ])
     fn2.set_o_state([ "y 2", "y 4" ])
 
-    fn3 = cSOSODE_FUNCTION(g1)
+    fn3 = kSosodeFunction(g1)
     fn3.set_o_param([ "theta 1", "theta 2" ])
 
     a = fn1( [1,2,3,4], 0, [1,2] )
@@ -597,7 +594,7 @@ if __name__ == "__main__":
     # the main object:
     print()
     print("--  REGULAR TESTS...  --")
-    b = cSOSODE(fn1, fn2)
+    b = kSosode(fn1, fn2)
     b.register(fn3)
     b._check_sanity()
 
@@ -624,22 +621,22 @@ if __name__ == "__main__":
     print()
     print("--  SEQUENCE CALC PARAMS  --")
 
-    fn1 = cSOSODE_FUNCTION(None)
+    fn1 = kSosodeFunction(None)
     fn1.set_o_param(['t1','t2'])
     fn1.set_i_param(['t3','t4'])
 
-    fn2 = cSOSODE_FUNCTION(None)
+    fn2 = kSosodeFunction(None)
     fn2.set_o_param(['t3','t4'])
     fn2.set_i_param(['t5','t6'])
 
-    fn3 = cSOSODE_FUNCTION(None)
+    fn3 = kSosodeFunction(None)
     fn3.set_o_param(['t5'])
     #fn3.set_i_param(['t1'])
 
-    fn4 = cSOSODE_FUNCTION(None)
+    fn4 = kSosodeFunction(None)
     fn4.set_o_param(['t6'])
 
-    b = cSOSODE( fn1, fn2, fn3, fn4 )
+    b = kSosode( fn1, fn2, fn3, fn4 )
     if b._who_calcs_param('t1') != 0: print("ERRO 1")
     if b._who_calcs_param('t4') != 1: print("ERRO 2")
 
@@ -674,21 +671,21 @@ if __name__ == "__main__":
     def g2(t, *args): return (args[0] + 1.)*args[1]
     def g3(t, *args): return [ (-2 if t < 2.5 else 0), 2. ]
 
-    gn0 = cSOSODE_FUNCTION(g0)
+    gn0 = kSosodeFunction(g0)
     gn0.set_o_param(['t1'])
     gn0.set_i_param(['t2', 't3'])
 
-    gn1 = cSOSODE_FUNCTION(g1)
+    gn1 = kSosodeFunction(g1)
     gn1.set_o_param(['t2'])
 
-    gn2 = cSOSODE_FUNCTION(g2)
+    gn2 = kSosodeFunction(g2)
     gn2.set_o_param(['t3'])
     gn2.set_i_param(['t4', 't5'])
 
-    gn3 = cSOSODE_FUNCTION(g3)
+    gn3 = kSosodeFunction(g3)
     gn3.set_o_param(['t4', 't5'])
 
-    b = cSOSODE( gn0, gn1, gn2, gn3 )
+    b = kSosode( gn0, gn1, gn2, gn3 )
     b._create_all_sets()
 
     b.create_nets()
@@ -720,12 +717,12 @@ if __name__ == "__main__":
         ])
         return yp
 
-    fn0 = cSOSODE_FUNCTION(f0)
+    fn0 = kSosodeFunction(f0)
     fn0.set_i_state([ 'y0', 'y1', 'y2', 'y3' ])
     fn0.set_i_param([ 't1', 't2' ])
     fn0.set_o_state([ 'y0', 'y2' ])
 
-    fn1 = cSOSODE_FUNCTION(f1)
+    fn1 = kSosodeFunction(f1)
     fn1.set_i_state([ 'y0', 'y1', 'y2', 'y3' ])
     fn1.set_o_state([ 'y1', 'y3' ])
 
@@ -763,23 +760,23 @@ if __name__ == "__main__":
     def eq2(t, y):
         return (y[0]*y[1]) - (8.*y[2]/3)
 
-    fn0 = cSOSODE_FUNCTION(eq0)
+    fn0 = kSosodeFunction(eq0)
     fn0.set_i_state([ 'y0', 'y1' ])
     fn0.set_i_param([ 'tta' ])
     fn0.set_o_state([ 'y0' ])
 
-    fn1 = cSOSODE_FUNCTION(eq1)
+    fn1 = kSosodeFunction(eq1)
     fn1.set_i_state([ 'y0', 'y1', 'y2' ])
     fn1.set_o_state([ 'y1' ])
 
-    fn2 = cSOSODE_FUNCTION(eq2)
+    fn2 = kSosodeFunction(eq2)
     fn2.set_i_state([ 'y0', 'y1', 'y2' ])
     fn2.set_o_state([ 'y2' ])
 
-    g0 = cSOSODE_FUNCTION(tta)
+    g0 = kSosodeFunction(tta)
     g0.set_o_param([ 'tta' ])
 
-    b = cSOSODE( fn0, fn1, fn2, g0, reverse=True, order_states= [ 'y0', 'y1', 'y2' ] )
+    b = kSosode( fn0, fn1, fn2, g0, reverse=True, order_states= [ 'y0', 'y1', 'y2' ] )
     b.create_nets()
     b.showregisteredfunctions()
 
