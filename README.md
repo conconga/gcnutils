@@ -56,8 +56,13 @@ or parameters.
 
 # Example 1
 
-Consider the following differential system of equations: $$ <sub>=</sub>
-f_1(y,t,\_1,\_2) $$ and $$ <sub>=</sub> f_2(y,t) $$
+Consider the following differential system of equations:
+
+$$ \[ y_1, y_3 \]^T = f_1(y,t,\_1,\_2) $$
+
+and
+
+$$ <sub>=</sub> f_2(y,t) $$
 
 with: $$ <sub>=</sub> g(y,t) $$
 

@@ -48,8 +48,11 @@ parameters.
 # Example 1
 
 Consider the following differential system of equations:
-$$ \left[ y_1 \\ y_3 \right] ~=~ f_1(y,t,\theta_1,\theta_2) $$
+
+$$ \[ y_1, y_3 \]^T = f_1(y,t,\theta_1,\theta_2) $$
+
 and
+
 $$ \left[ y_2 \\ y_4 \right] ~=~ f_2(y,t) $$
 
 with:
