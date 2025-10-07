@@ -37,8 +37,6 @@ this order, as much as `i_param=['e','f']`. The return with also be
 A sanity check is provided to certify that all necessary inputs and params are
 available to calculate the global state $y$.
 
-The handler to the global $dy/dt$ is provided by `get_globalf()`.
-
 # Each piece of the System
 
 Each piece of the system is created by the object `kSosodeFunction()`, and
@@ -115,7 +113,7 @@ The single system of systems is build with:
 
     # : reverse      : True if input order will be (y,t) instead of (t,y)
     # : order_states : list with the order of states in the state vector.
-#
+
     b = kSosode( fn0, fn1, fn2, g0, reverse=True, order_states= [ 'y0', 'y1', 'y2' ] )
     b.create_nets()
     b.showregisteredfunctions()

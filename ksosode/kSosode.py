@@ -36,8 +36,6 @@
 #     A sanity check is provided to certify that all necessary inputs and params are     @
 #     available to calculate the global state y.                                         @
 #                                                                                        @
-#     The handler to the global d_y/dt is provided by get_globalf().                     @
-#                                                                                        @
 ##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ###@@##@@##@ @#@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
 ##>>                                                                                  <<##
 ##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ###@@##@@##@ @#@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
