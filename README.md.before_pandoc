@@ -11,6 +11,7 @@ cascade of functions, the object determines the sequence of calls to solve the
 parameters.
 
 The goal is to generate a function as:
+
 $$ dy(t)/dt = f(y,t) $$
 
 where $f(y,t)$ is callable by the integrator, and $y$ is the global state
