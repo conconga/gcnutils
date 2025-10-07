@@ -49,11 +49,11 @@ parameters.
 
 Consider the following differential system of equations:
 
-$$ \[ y_1, y_3 \]^T = f_1(y,t,\theta_1,\theta_2) $$
+$$ \[ \dot{y}_1, \dot{y}_3 \]^T = f_1(y,t,\theta_1,\theta_2) $$
 
 and
 
-$$ \[ y_2, y_4 \]^T = f_2(y,t) $$
+$$ \[ \dot{y}_2, \dot{y}_4 \]^T = f_2(y,t) $$
 
 with:
 
@@ -75,14 +75,13 @@ The single system of systems is build with:
 
     # : reverse      : True if input order will be (y,t) instead of (t,y)
     # : order_states : list with the order of states in the state vector.
+
     a = kSosode( fn1, fn2, fn3, reverse=True, order_states= [ "y 2", "y 3", "y 4", "y 1" ] )
     a.create_nets()
     a.showregisteredfunctions()
 ```
 
 # Example 2 (with integration)
-
-This example is adapted from [here](http://support.ptc.com/help/mathcad/en/index.html#page/PTC_Mathcad_Help/example_solving_a_first_order_system_of_ODEs.html).
 
 ```
     def tta(t):
@@ -114,6 +113,9 @@ This example is adapted from [here](http://support.ptc.com/help/mathcad/en/index
     g0 = kSosodeFunction(tta)
     g0.set_o_param([ 'tta' ])
 
+    # : reverse      : True if input order will be (y,t) instead of (t,y)
+    # : order_states : list with the order of states in the state vector.
+#
     b = kSosode( fn0, fn1, fn2, g0, reverse=True, order_states= [ 'y0', 'y1', 'y2' ] )
     b.create_nets()
     b.showregisteredfunctions()
