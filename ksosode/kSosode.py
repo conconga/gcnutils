@@ -106,7 +106,7 @@ class kSosode:
             self._create_net_params()
             self._create_net_states()
         else:
-            print("create_net: the net will not be created.")
+            raise(NameError("create_net: the net will not be created."))
 
         return ret
 
@@ -143,7 +143,11 @@ class kSosode:
 
         if self.order_states is not None:
             if set(self.list_of_states) == set(self.order_states):
+                # set new order:
                 self.list_of_states = self.order_states
+            else:
+                # not all states are to be updated?
+                raise(NameError("are you sure not all states are to be updated?"))
 
 
     def _who_calcs_param(self, param):
@@ -686,7 +690,13 @@ if __name__ == "__main__":
     b = kSosode( gn0, gn1, gn2, gn3 )
     b._create_all_sets()
 
-    b.create_nets()
+    try:
+        ok = False
+        b.create_nets()
+    except:
+        ok = True
+    assert ok
+
     b._create_net_params()
     for t in np.arange(0,5,0.1):
         i = b._calc_all_parameters_full(t)
