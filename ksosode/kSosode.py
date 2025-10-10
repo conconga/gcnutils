@@ -71,7 +71,7 @@ class kSosode:
     def __init__(self, *fn_objs, reverse=False, order_states=None):
         """
         Use:
-            reverse      :  True if input order will be (y,t) instead of (t,y)
+            reverse      :  True if integrator-input order will be (y,t) instead of (t,y)
             order_states :  list with the order of states in the state vector.
         """
 
