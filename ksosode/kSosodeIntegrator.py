@@ -16,14 +16,11 @@ GitHub:
 import numpy            as np
 import scipy.integrate  as Int
 from kSosode import *
-#from math       import sin, cos, pi
-#from kgenerator import kSignalGenerator
-#from submodules import *
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 #                                                                                  #
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
-class kSosodeCommon:
+class kSosodeUtils:
     """
     Helpful methods to be adopted when modeling a system with SoSODE.
     """
@@ -104,58 +101,60 @@ class kSosodeIntegrator:
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 #                                                                                  #
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
+class kExample_RC_discharge_system:
+    """
+    Modeling of the following differential equation:
 
+        d v(t) / dt = -(1/RC).v(t)
+
+    """
+    def __init__(self, *args, **kargs):
+        super().__init__(*args, **kargs)
+
+    def __init__(self, **kargs):
+        R   = 100 if not self._try_to_get(kargs, "R")    else self._try_to_get(kargs, "R")
+        C   = 100e-9 if not self._try_to_get(kargs, "C") else self._try_to_get(kargs, "C")
+        V   = 5.0 if not self._try_to_get(kargs, "V")    else self._try_to_get(kargs, "V")
+
+        self.R = R
+        self.C = C
+
+        self.order_states = ["V"]
+        self.state0 =       [ V ]
+
+        # system registration:
+        fn_dVdt = kSosodeFunction(self.sys_dVdt)
+        fn_dVdt.set_i_state([ 'V' ]) # receives 'V'
+        fn_dVdt.set_o_state([ 'V' ]) # returns the first derivative of 'V'
+
+        self.sys = kSosode( fn_dVdt, reverse=True, order_states=self.order_states )
+        self.sys.create_nets()
+
+    def sys_dVdt(self, t, state):
+        V    = state[0]
+        dVdt = -V/(self.R*self.C)
+        return [dVdt]
+
+class kExample_RC_discharge(kSosodeUtils, kSosodeIntegrator, kExample_RC_discharge_system):
+    def __init__(self, sample_freq_Hz, **kargs):
+        # initialize the System of Systems model:
+        super().__init__(**kargs)
+
+        assert sample_freq_Hz is not None
+        assert sample_freq_Hz > 0
+
+        self.dt        = 1./sample_freq_Hz
+
+    def get_V(self):
+        return self.pick_from_state( 'V' )
+
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
+#                                                                                  #
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 if __name__ == "__main__":
     sample_freq_Hz    = 100
     t_max_simu        = 2
     T                 = np.arange(0, t_max_simu, 1./sample_freq_Hz)
-
-    class kExample_RC_discharge_system:
-        """
-        Modeling of the following differential equation:
-
-            d v(t) / dt = -(1/RC).v(t)
-
-        """
-        def __init__(self, *args, **kargs):
-            super().__init__(*args, **kargs)
-
-        def __init__(self, **kargs):
-            R   = 100 if not self._try_to_get(kargs, "R")    else self._try_to_get(kargs, "R")
-            C   = 100e-9 if not self._try_to_get(kargs, "C") else self._try_to_get(kargs, "C")
-            V   = 5.0 if not self._try_to_get(kargs, "V")    else self._try_to_get(kargs, "V")
-
-            self.R = R
-            self.C = C
-
-            self.order_states = ["V"]
-            self.state0 =       [ V ]
-
-            # system registration:
-            fn_dVdt = kSosodeFunction(self.sys_dVdt)
-            fn_dVdt.set_i_state([ 'V' ]) # receives 'V'
-            fn_dVdt.set_o_state([ 'V' ]) # returns the first derivative of 'V'
-
-            self.sys = kSosode( fn_dVdt, reverse=True, order_states=self.order_states )
-            self.sys.create_nets()
-
-        def sys_dVdt(self, t, state):
-            V    = state[0]
-            dVdt = -V/(self.R*self.C)
-            return [dVdt]
-
-    class kExample_RC_discharge(kSosodeCommon, kSosodeIntegrator, kExample_RC_discharge_system):
-        def __init__(self, sample_freq_Hz, **kargs):
-            # initialize the System of Systems model:
-            super().__init__(**kargs)
-
-            assert sample_freq_Hz is not None
-            assert sample_freq_Hz > 0
-
-            self.dt        = 1./sample_freq_Hz
-
-        def get_V(self):
-            return self.pick_from_state( 'V' )
 
     ###########################
     ##mm==-- main loop --==mm##
