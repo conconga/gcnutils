@@ -2,11 +2,13 @@
     ODE’s](#system-of-systems-of-odes)
 -   [<span class="toc-section-number">2</span> Each piece of the
     System](#each-piece-of-the-system)
--   [<span class="toc-section-number">3</span> Example 1](#example-1)
--   [<span class="toc-section-number">4</span> Example 2 (with
-    integration)](#example-2-with-integration)
--   [<span class="toc-section-number">5</span> Example 3 (using
-    integration object)](#example-3-using-integration-object)
+-   [<span class="toc-section-number">3</span> Examples](#examples)
+    -   [<span class="toc-section-number">3.1</span> Example
+        1](#example-1)
+    -   [<span class="toc-section-number">3.2</span> Example 2 (with
+        integration)](#example-2-with-integration)
+    -   [<span class="toc-section-number">3.3</span> Example 3 (using
+        integration object)](#example-3-using-integration-object)
 
 # System of Systems of ODE's
 
@@ -54,7 +56,9 @@ Each piece of the system is created by the object `kSosodeFunction()`, and
 defined by the input states and parameters, and output d(states)/dt or
 parameters.
 
-# Example 1
+# Examples
+
+## Example 1
 
 Consider the following differential system of equations:
 
@@ -90,7 +94,7 @@ The single system of systems is build with:
     a.showregisteredfunctions()
 ```
 
-# Example 2 (with integration)
+## Example 2 (with integration)
 
 ```
     def tta(t):
@@ -133,7 +137,7 @@ The single system of systems is build with:
     R = Int.odeint(b, [-1, 0, 1], T, args=() )
 ```
 
-# Example 3 (using integration object)
+## Example 3 (using integration object)
 
 (See example in `__main__` in source files.)
 
@@ -155,4 +159,5 @@ for rc in [kExample_RC_discharge(100, R=1e6), kExample_RC_discharge(100, V=3, R=
     for t in T:
         # update current state vector:
         rc.update()
+        print(rc.get_V())
 ```
