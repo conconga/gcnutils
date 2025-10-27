@@ -5,6 +5,8 @@
 -   [<span class="toc-section-number">3</span> Example 1](#example-1)
 -   [<span class="toc-section-number">4</span> Example 2 (with
     integration)](#example-2-with-integration)
+-   [<span class="toc-section-number">5</span> Example 3 (using
+    integration object)](#example-3-using-integration-object)
 
 # System of Systems of ODE's
 
@@ -129,4 +131,28 @@ The single system of systems is build with:
 
     T = np.linspace(0,12.0,1000)
     R = Int.odeint(b, [-1, 0, 1], T, args=() )
+```
+
+# Example 3 (using integration object)
+
+(See example in `__main__` in source files.)
+
+```
+class kExample_RC_discharge(kSosodeUtils, kSosodeIntegrator, kExample_RC_discharge_system):
+    def __init__(self, sample_freq_Hz, **kargs):
+        # initialize the System of Systems model:
+        super().__init__(**kargs)
+
+        assert sample_freq_Hz is not None
+        assert sample_freq_Hz > 0
+
+        self.dt        = 1./sample_freq_Hz
+
+    def get_V(self):
+        return self.pick_from_state( 'V' )
+
+for rc in [kExample_RC_discharge(100, R=1e6), kExample_RC_discharge(100, V=3, R=100e3, C=4.7e-6)]:
+    for t in T:
+        # update current state vector:
+        rc.update()
 ```
