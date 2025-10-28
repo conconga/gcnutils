@@ -15,7 +15,7 @@ GitHub:
 
 import numpy            as np
 import scipy.integrate  as Int
-from kSosode import *
+from .kSosode import *
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 #                                                                                  #
@@ -25,10 +25,10 @@ class kSosodeUtils:
     Helpful methods to be adopted when modeling a system with SoSODE.
     """
 
-    def __init__(self, *args, **kargs):
-        super().__init__(*args, **kargs)
+    def __init__(self, **kargs):
+        super().__init__(**kargs)
 
-    def _try_to_get(self, kargs, txt):
+    def try_to_get(self, kargs, txt):
         try:
             ret = kargs[txt]
         except:
@@ -69,8 +69,8 @@ class kSosodeUtils:
 #                                                                                  #
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 class kSosodeIntegrator:
-    def __init__(self, *args, **kargs):
-        super().__init__(*args, **kargs)
+    def __init__(self, **kargs):
+        super().__init__(**kargs)
 
         self.curr_time = -1.0 # it shall start negative
 
@@ -80,8 +80,11 @@ class kSosodeIntegrator:
             self.dt         :  integration step
             self.curr_time  :  time instant of the last available integration step
                             :  the curr_time shall be initialized negative before any integration
+            self.state      :  most update state of the system
             self.state0     :  provided state vector for t=0[s]
+            self.sys        :  system of systems of ODE with the model to integrate
         """
+
         if self.curr_time < 0:
             # only for t=0
             self.curr_time = 0.0
@@ -108,13 +111,12 @@ class kExample_RC_discharge_system:
         d v(t) / dt = -(1/RC).v(t)
 
     """
-    def __init__(self, *args, **kargs):
-        super().__init__(*args, **kargs)
-
     def __init__(self, **kargs):
-        R   = 100 if not self._try_to_get(kargs, "R")    else self._try_to_get(kargs, "R")
-        C   = 100e-9 if not self._try_to_get(kargs, "C") else self._try_to_get(kargs, "C")
-        V   = 5.0 if not self._try_to_get(kargs, "V")    else self._try_to_get(kargs, "V")
+        super().__init__(**kargs)
+
+        R   = 100 if not self.try_to_get(kargs, "R")    else self.try_to_get(kargs, "R")
+        C   = 100e-9 if not self.try_to_get(kargs, "C") else self.try_to_get(kargs, "C")
+        V   = 5.0 if not self.try_to_get(kargs, "V")    else self.try_to_get(kargs, "V")
 
         self.R = R
         self.C = C
@@ -135,7 +137,15 @@ class kExample_RC_discharge_system:
         dVdt = -V/(self.R*self.C)
         return [dVdt]
 
-class kExample_RC_discharge(kSosodeUtils, kSosodeIntegrator, kExample_RC_discharge_system):
+class kExample_Base:
+    """
+    The `object.__init__()` method does not accept arguments. This class is just to
+    forward the call without arguments.
+    """
+    def __init__(self, **kargs):
+        super().__init__()
+
+class kExample_RC_discharge(kSosodeUtils, kSosodeIntegrator, kExample_RC_discharge_system, kExample_Base):
     def __init__(self, sample_freq_Hz, **kargs):
         # initialize the System of Systems model:
         super().__init__(**kargs)
@@ -151,33 +161,34 @@ class kExample_RC_discharge(kSosodeUtils, kSosodeIntegrator, kExample_RC_dischar
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 #                                                                                  #
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
-if __name__ == "__main__":
-    sample_freq_Hz    = 100
-    t_max_simu        = 2
-    T                 = np.arange(0, t_max_simu, 1./sample_freq_Hz)
+class kSosodeIntegratorTests:
+    def do_tests(self):
+        sample_freq_Hz    = 100
+        t_max_simu        = 2
+        T                 = np.arange(0, t_max_simu, 1./sample_freq_Hz)
 
-    ###########################
-    ##mm==-- main loop --==mm##
+        ###########################
+        ##mm==-- main loop --==mm##
 
-    import matplotlib.pylab as plt
-    plt.figure(1).clf()
-    fig, ax = plt.subplots(1,1,num=1)
+        import matplotlib.pylab as plt
+        plt.figure(1).clf()
+        fig, ax = plt.subplots(1,1,num=1)
 
-    for rc in [kExample_RC_discharge(100, R=1e6), kExample_RC_discharge(100, V=3, R=100e3, C=4.7e-6)]:
-        rc_log = list()
-        for t in T:
-            # update current state vector:
-            rc_log.append( rc.update() )
+        for rc in [kExample_RC_discharge(100, R=1e6), kExample_RC_discharge(100, V=3, R=100e3, C=4.7e-6)]:
+            rc_log = list()
+            for t in T:
+                # update current state vector:
+                rc_log.append( rc.update() )
 
-        ax.plot(T, rc_log)
+            ax.plot(T, rc_log)
 
-    ax.grid(True)
-    ax.set_xlabel("time [s]")
-    ax.set_ylabel("Vc [V]")
+        ax.grid(True)
+        ax.set_xlabel("time [s]")
+        ax.set_ylabel("Vc [V]")
 
-    #####################
-    plt.tight_layout()
-    plt.show(block=False)
-    #####################
+        #####################
+        plt.tight_layout()
+        plt.show(block=False)
+        #####################
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#

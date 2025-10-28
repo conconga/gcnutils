@@ -543,262 +543,262 @@ class kSosode:
 ##>>                                                                                  <<##
 ##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ###@@##@@##@ @#@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
 
-if __name__ == "__main__":
+class kSosodeTests:
+    def do_tests(self):
+        import numpy            as np
+        import scipy.integrate  as Int
+        import matplotlib.pylab as plt
 
-    import numpy            as np
-    import scipy.integrate  as Int
-    import matplotlib.pylab as plt
+        def f1(y, t, PARAM):
+            tta1 = PARAM[0]
+            tta2 = PARAM[1]
 
-    def f1(y, t, PARAM):
-        tta1 = PARAM[0]
-        tta2 = PARAM[1]
+            yp = np.asarray([
+                (   4*y[0]) - (tta1*y[0]*y[1]),
+                (tta2*y[2]) - (  2.*y[2]*y[3]),
+            ])
 
-        yp = np.asarray([
-            (   4*y[0]) - (tta1*y[0]*y[1]),
-            (tta2*y[2]) - (  2.*y[2]*y[3]),
-        ])
+            return yp
 
-        return yp
+        ##@@##@@##@@ ##@@##@@##@@
 
-    ##@@##@@##@@ ##@@##@@##@@
+        def f2(y, t):
 
-    def f2(y, t):
+            yp = np.asarray([
+                (  -3*y[1]) + (  3.*y[0]*y[1]),
+                (  -3*y[3]) + (  3.*y[2]*y[3]),
+            ])
 
-        yp = np.asarray([
-            (  -3*y[1]) + (  3.*y[0]*y[1]),
-            (  -3*y[3]) + (  3.*y[2]*y[3]),
-        ])
+            return yp
 
-        return yp
+        ##@@##@@##@@ ##@@##@@##@@
 
-    ##@@##@@##@@ ##@@##@@##@@
+        def g1(y, t):
+            return (2,4) if t < 5 else (1,5)
 
-    def g1(y, t):
-        return (2,4) if t < 5 else (1,5)
+        ##@@##@@##@@ ##@@##@@##@@
 
-    ##@@##@@##@@ ##@@##@@##@@
+        fn1 = kSosodeFunction(f1)
+        fn1.set_i_state([ "y 1", "y 2", "y 3", "y 4" ])
+        fn1.set_i_param([ "theta 1", "theta 2" ])
+        fn1.set_o_state([ "y 1", "y 3" ])
 
-    fn1 = kSosodeFunction(f1)
-    fn1.set_i_state([ "y 1", "y 2", "y 3", "y 4" ])
-    fn1.set_i_param([ "theta 1", "theta 2" ])
-    fn1.set_o_state([ "y 1", "y 3" ])
+        fn2 = kSosodeFunction(f2)
+        fn2.set_i_state([ "y 1", "y 2", "y 3", "y 4" ])
+        fn2.set_o_state([ "y 2", "y 4" ])
 
-    fn2 = kSosodeFunction(f2)
-    fn2.set_i_state([ "y 1", "y 2", "y 3", "y 4" ])
-    fn2.set_o_state([ "y 2", "y 4" ])
+        fn3 = kSosodeFunction(g1)
+        fn3.set_o_param([ "theta 1", "theta 2" ])
 
-    fn3 = kSosodeFunction(g1)
-    fn3.set_o_param([ "theta 1", "theta 2" ])
-
-    a = fn1( [1,2,3,4], 0, [1,2] )
-    
-    ##@@##@@##@@ ##@@##@@##@@
-    # the main object:
-    print()
-    print("--  REGULAR TESTS...  --")
-    b = kSosode(fn1, fn2)
-    b.register(fn3)
-    b._check_sanity()
+        a = fn1( [1,2,3,4], 0, [1,2] )
+        
+        ##@@##@@##@@ ##@@##@@##@@
+        # the main object:
+        print()
+        print("--  REGULAR TESTS...  --")
+        b = kSosode(fn1, fn2)
+        b.register(fn3)
+        b._check_sanity()
 
 
-    ##@@##@@##@@ ##@@##@@##@@
-    print()
-    print("--  SANITY CHECKS...  --")
+        ##@@##@@##@@ ##@@##@@##@@
+        print()
+        print("--  SANITY CHECKS...  --")
 
-    # erro: 1
-    fn1.set_o_state([ "y 1", "y 3", "y 2" ])
-    b._check_sanity()
+        # erro: 1
+        fn1.set_o_state([ "y 1", "y 3", "y 2" ])
+        b._check_sanity()
 
-    # erro: 2 and 3
-    fn1.set_o_state([])
-    fn1.set_o_param([])
-    b._check_sanity()
+        # erro: 2 and 3
+        fn1.set_o_state([])
+        fn1.set_o_param([])
+        b._check_sanity()
 
-    # erro: 4
-    fn1.set_o_state([ "y 1", "y 3" ])
-    fn1.set_o_param([ "y 1", "y 3" ])
-    b._check_sanity()
+        # erro: 4
+        fn1.set_o_state([ "y 1", "y 3" ])
+        fn1.set_o_param([ "y 1", "y 3" ])
+        b._check_sanity()
 
-    ##@@##@@##@@ ##@@##@@##@@
-    print()
-    print("--  SEQUENCE CALC PARAMS  --")
+        ##@@##@@##@@ ##@@##@@##@@
+        print()
+        print("--  SEQUENCE CALC PARAMS  --")
 
-    fn1 = kSosodeFunction(None)
-    fn1.set_o_param(['t1','t2'])
-    fn1.set_i_param(['t3','t4'])
+        fn1 = kSosodeFunction(None)
+        fn1.set_o_param(['t1','t2'])
+        fn1.set_i_param(['t3','t4'])
 
-    fn2 = kSosodeFunction(None)
-    fn2.set_o_param(['t3','t4'])
-    fn2.set_i_param(['t5','t6'])
+        fn2 = kSosodeFunction(None)
+        fn2.set_o_param(['t3','t4'])
+        fn2.set_i_param(['t5','t6'])
 
-    fn3 = kSosodeFunction(None)
-    fn3.set_o_param(['t5'])
-    #fn3.set_i_param(['t1'])
+        fn3 = kSosodeFunction(None)
+        fn3.set_o_param(['t5'])
+        #fn3.set_i_param(['t1'])
 
-    fn4 = kSosodeFunction(None)
-    fn4.set_o_param(['t6'])
+        fn4 = kSosodeFunction(None)
+        fn4.set_o_param(['t6'])
 
-    b = kSosode( fn1, fn2, fn3, fn4 )
-    if b._who_calcs_param('t1') != 0: print("ERRO 1")
-    if b._who_calcs_param('t4') != 1: print("ERRO 2")
+        b = kSosode( fn1, fn2, fn3, fn4 )
+        if b._who_calcs_param('t1') != 0: print("ERRO 1")
+        if b._who_calcs_param('t4') != 1: print("ERRO 2")
 
-    for i in range(6):
-        j = "t{:d}".format(i+1)
-        k = b._sequence_calc_parameter(j)
+        for i in range(6):
+            j = "t{:d}".format(i+1)
+            k = b._sequence_calc_parameter(j)
 
-        if k != [ [0, 1, 2, 3], [0, 1, 2, 3], [1, 2, 3], [1, 2, 3], [2], [3] ][i]:
-            print("ERROR while calculating {:s}".format(j))
-        else:
-            print("for '{:s}', these functions are called: {:s}".format(j, k.__str__()))
+            if k != [ [0, 1, 2, 3], [0, 1, 2, 3], [1, 2, 3], [1, 2, 3], [2], [3] ][i]:
+                print("ERROR while calculating {:s}".format(j))
+            else:
+                print("for '{:s}', these functions are called: {:s}".format(j, k.__str__()))
 
-    # this line will create and infinity loop:
-    print("adding an infinity loop...")
-    fn3.set_i_param(['t1'])
+        # this line will create and infinity loop:
+        print("adding an infinity loop...")
+        fn3.set_i_param(['t1'])
 
-    for i in range(6):
-        j = "t{:d}".format(i+1)
-        k = b._sequence_calc_parameter(j)
+        for i in range(6):
+            j = "t{:d}".format(i+1)
+            k = b._sequence_calc_parameter(j)
 
-        if k != [ -1, -1, -1, -1, -1, [3] ][i]:
-            print("ERROR while calculating {:s}".format(j))
-        else:
-            print("for '{:s}', these functions are called: {:s}".format(j, k.__str__()))
+            if k != [ -1, -1, -1, -1, -1, [3] ][i]:
+                print("ERROR while calculating {:s}".format(j))
+            else:
+                print("for '{:s}', these functions are called: {:s}".format(j, k.__str__()))
 
-    # test calculation of parameters:
-    print()
-    print("--  TEST CALC of PARAMETERS  --")
+        # test calculation of parameters:
+        print()
+        print("--  TEST CALC of PARAMETERS  --")
 
-    def g0(t, *args): return (args[0]+args[1])
-    def g1(t, *args): return (3 if t < 2 else 4)
-    def g2(t, *args): return (args[0] + 1.)*args[1]
-    def g3(t, *args): return [ (-2 if t < 2.5 else 0), 2. ]
+        def g0(t, *args): return (args[0]+args[1])
+        def g1(t, *args): return (3 if t < 2 else 4)
+        def g2(t, *args): return (args[0] + 1.)*args[1]
+        def g3(t, *args): return [ (-2 if t < 2.5 else 0), 2. ]
 
-    gn0 = kSosodeFunction(g0)
-    gn0.set_o_param(['t1'])
-    gn0.set_i_param(['t2', 't3'])
+        gn0 = kSosodeFunction(g0)
+        gn0.set_o_param(['t1'])
+        gn0.set_i_param(['t2', 't3'])
 
-    gn1 = kSosodeFunction(g1)
-    gn1.set_o_param(['t2'])
+        gn1 = kSosodeFunction(g1)
+        gn1.set_o_param(['t2'])
 
-    gn2 = kSosodeFunction(g2)
-    gn2.set_o_param(['t3'])
-    gn2.set_i_param(['t4', 't5'])
+        gn2 = kSosodeFunction(g2)
+        gn2.set_o_param(['t3'])
+        gn2.set_i_param(['t4', 't5'])
 
-    gn3 = kSosodeFunction(g3)
-    gn3.set_o_param(['t4', 't5'])
+        gn3 = kSosodeFunction(g3)
+        gn3.set_o_param(['t4', 't5'])
 
-    b = kSosode( gn0, gn1, gn2, gn3 )
-    b._create_all_sets()
+        b = kSosode( gn0, gn1, gn2, gn3 )
+        b._create_all_sets()
 
-    try:
-        ok = False
+        try:
+            ok = False
+            b.create_nets()
+        except:
+            ok = True
+        assert ok
+
+        b._create_net_params()
+        for t in np.arange(0,5,0.1):
+            i = b._calc_all_parameters_full(t)
+            j = b._calc_all_parameters(t) # needs _create_net_params()
+
+            if i != j:
+                print("ERROR calculating the arguments since {:s} != {:s}".format(i.__str__(), j.__str__()))
+
+        # test calculation of parameters:
+        print()
+        print("--  TEST CALC of ddt_STATES  --")
+
+        def f0(t, y, *args): 
+            tta1 = args[0]
+            tta2 = args[1]
+            yp = np.asarray([
+                (   4*y[0]) - (tta1*y[0]*y[1]),
+                (tta2*y[2]) - (  2.*y[2]*y[3]),
+            ])
+            return yp
+
+        def f1(t, y):
+            yp = np.asarray([
+                (  -3*y[1]) + (  3.*y[0]*y[1]),
+                (  -3*y[3]) + (  3.*y[2]*y[3]),
+            ])
+            return yp
+
+        fn0 = kSosodeFunction(f0)
+        fn0.set_i_state([ 'y0', 'y1', 'y2', 'y3' ])
+        fn0.set_i_param([ 't1', 't2' ])
+        fn0.set_o_state([ 'y0', 'y2' ])
+
+        fn1 = kSosodeFunction(f1)
+        fn1.set_i_state([ 'y0', 'y1', 'y2', 'y3' ])
+        fn1.set_o_state([ 'y1', 'y3' ])
+
+        b.register(fn0)
+        b.register(fn1)
+        b.showregisteredfunctions()
         b.create_nets()
-    except:
-        ok = True
-    assert ok
 
-    b._create_net_params()
-    for t in np.arange(0,5,0.1):
-        i = b._calc_all_parameters_full(t)
-        j = b._calc_all_parameters(t) # needs _create_net_params()
+        for t in np.arange(0,5,0.1):
+            i = b._calc_all_parameters(t)
+            m = np.random.randn(4)
+            j = b(t, m)
+            k = b._calc_all_ddtstates_full(t, m, i)
 
-        if i != j:
-            print("ERROR calculating the arguments since {:s} != {:s}".format(i.__str__(), j.__str__()))
+            if j != k:
+                print("ERROR calculating the ddt_states since {:s} != {:s}".format(j.__str__(), k.__str__()))
 
-    # test calculation of parameters:
-    print()
-    print("--  TEST CALC of ddt_STATES  --")
+        # test calculation of parameters:
+        print()
+        print("--  TEST FULL SYSTEM  --")
 
-    def f0(t, y, *args): 
-        tta1 = args[0]
-        tta2 = args[1]
-        yp = np.asarray([
-            (   4*y[0]) - (tta1*y[0]*y[1]),
-            (tta2*y[2]) - (  2.*y[2]*y[3]),
-        ])
-        return yp
+        # from:
+        #   http://support.ptc.com/help/mathcad/en/index.html#page/PTC_Mathcad_Help/example_solving_a_first_order_system_of_ODEs.html
 
-    def f1(t, y):
-        yp = np.asarray([
-            (  -3*y[1]) + (  3.*y[0]*y[1]),
-            (  -3*y[3]) + (  3.*y[2]*y[3]),
-        ])
-        return yp
+        def tta(t):
+            return 8 if t < 10 else -2
 
-    fn0 = kSosodeFunction(f0)
-    fn0.set_i_state([ 'y0', 'y1', 'y2', 'y3' ])
-    fn0.set_i_param([ 't1', 't2' ])
-    fn0.set_o_state([ 'y0', 'y2' ])
+        def eq0(t, y, *args):
+            tta = args[0]
+            return (-8.*y[0]) + (tta*y[1])
 
-    fn1 = kSosodeFunction(f1)
-    fn1.set_i_state([ 'y0', 'y1', 'y2', 'y3' ])
-    fn1.set_o_state([ 'y1', 'y3' ])
+        def eq1(t, y):
+            return (30*y[0]) + y[1] - (y[0]*y[2])
 
-    b.register(fn0)
-    b.register(fn1)
-    b.showregisteredfunctions()
-    b.create_nets()
+        def eq2(t, y):
+            return (y[0]*y[1]) - (8.*y[2]/3)
 
-    for t in np.arange(0,5,0.1):
-        i = b._calc_all_parameters(t)
-        m = np.random.randn(4)
-        j = b(t, m)
-        k = b._calc_all_ddtstates_full(t, m, i)
+        fn0 = kSosodeFunction(eq0)
+        fn0.set_i_state([ 'y0', 'y1' ])
+        fn0.set_i_param([ 'tta' ])
+        fn0.set_o_state([ 'y0' ])
 
-        if j != k:
-            print("ERROR calculating the ddt_states since {:s} != {:s}".format(j.__str__(), k.__str__()))
+        fn1 = kSosodeFunction(eq1)
+        fn1.set_i_state([ 'y0', 'y1', 'y2' ])
+        fn1.set_o_state([ 'y1' ])
 
-    # test calculation of parameters:
-    print()
-    print("--  TEST FULL SYSTEM  --")
+        fn2 = kSosodeFunction(eq2)
+        fn2.set_i_state([ 'y0', 'y1', 'y2' ])
+        fn2.set_o_state([ 'y2' ])
 
-    # from:
-    #   http://support.ptc.com/help/mathcad/en/index.html#page/PTC_Mathcad_Help/example_solving_a_first_order_system_of_ODEs.html
+        g0 = kSosodeFunction(tta)
+        g0.set_o_param([ 'tta' ])
 
-    def tta(t):
-        return 8 if t < 10 else -2
+        b = kSosode( fn0, fn1, fn2, g0, reverse=True, order_states= [ 'y0', 'y1', 'y2' ] )
+        b.create_nets()
+        b.showregisteredfunctions()
 
-    def eq0(t, y, *args):
-        tta = args[0]
-        return (-8.*y[0]) + (tta*y[1])
+        T = np.linspace(0,12.0,1000)
+        R = Int.odeint(b, [-1, 0, 1], T, args=() )
 
-    def eq1(t, y):
-        return (30*y[0]) + y[1] - (y[0]*y[2])
+        print()
+        print("DONE.")
 
-    def eq2(t, y):
-        return (y[0]*y[1]) - (8.*y[2]/3)
-
-    fn0 = kSosodeFunction(eq0)
-    fn0.set_i_state([ 'y0', 'y1' ])
-    fn0.set_i_param([ 'tta' ])
-    fn0.set_o_state([ 'y0' ])
-
-    fn1 = kSosodeFunction(eq1)
-    fn1.set_i_state([ 'y0', 'y1', 'y2' ])
-    fn1.set_o_state([ 'y1' ])
-
-    fn2 = kSosodeFunction(eq2)
-    fn2.set_i_state([ 'y0', 'y1', 'y2' ])
-    fn2.set_o_state([ 'y2' ])
-
-    g0 = kSosodeFunction(tta)
-    g0.set_o_param([ 'tta' ])
-
-    b = kSosode( fn0, fn1, fn2, g0, reverse=True, order_states= [ 'y0', 'y1', 'y2' ] )
-    b.create_nets()
-    b.showregisteredfunctions()
-
-    T = np.linspace(0,12.0,1000)
-    R = Int.odeint(b, [-1, 0, 1], T, args=() )
-
-    print()
-    print("DONE.")
-
-    # figure:
-    fig = plt.figure(0).clf()
-    ax  = plt.subplot(1,1,1)
-    ax.plot(T, R)
-    ax.grid(True)
-    plt.show(block=False)
+        # figure:
+        fig = plt.figure(0).clf()
+        ax  = plt.subplot(1,1,1)
+        ax.plot(T, R)
+        ax.grid(True)
+        plt.show(block=False)
 
 ##@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@ ###@@##@@##@ @#@@##@@##@@ ##@@##@@##@@ ##@@##@@##@@
