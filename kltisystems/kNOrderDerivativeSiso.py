@@ -111,37 +111,38 @@ class kNOrderDerivativeSiso:
 #################################
 ## ##WWww=--  main:  --=wwWW## ##
 #################################
-if __name__ == "__main__":
+class kNOrderDerivativeSisoTests:
+    def do_tests(self):
 
-    import matplotlib.pylab as plt
+        import matplotlib.pylab as plt
 
-    pole  = -100
-    order = 4
-    Fs    = 400 # [Hz]
-    Ts    = 1./Fs
-    obj   = kNOrderDerivativeSiso( 4, -100, Ts )
+        pole  = -100
+        order = 4
+        Fs    = 400 # [Hz]
+        Ts    = 1./Fs
+        obj   = kNOrderDerivativeSiso( 4, -100, Ts )
 
-    # time and input signal:
-    U = list()
-    for i in range(4):
-        v = np.random.randn()
-        U.append( [v for i in range(Fs)] )
-    U = np.hstack(U)
-    T = np.asarray(range(len(U))) * Ts
+        # time and input signal:
+        U = list()
+        for i in range(4):
+            v = np.random.randn()
+            U.append( [v for i in range(Fs)] )
+        U = np.hstack(U)
+        T = np.asarray(range(len(U))) * Ts
 
-    plt.figure(1).clf()
-    fig,ax = plt.subplots(order+1, 1, num=1, sharex=True)
-    ax[0].plot(T, U)
+        plt.figure(1).clf()
+        fig,ax = plt.subplots(order+1, 1, num=1, sharex=True)
+        ax[0].plot(T, U)
 
-    # all derivatives:
-    sysOut = list()
-    for i in U:
-        sysOut.append( obj.update(i) )
-    sysOut = np.asarray(sysOut)
+        # all derivatives:
+        sysOut = list()
+        for i in U:
+            sysOut.append( obj.update(i) )
+        sysOut = np.asarray(sysOut)
 
-    # for the pictures:
-    for i in range(order+1):
-        ax[i].plot(T, sysOut[:,i])
-        ax[i].grid(True)
+        # for the pictures:
+        for i in range(order+1):
+            ax[i].plot(T, sysOut[:,i])
+            ax[i].grid(True)
 
-    plt.show(block=False)
+        plt.show(block=False)
