@@ -60,10 +60,10 @@ class kNOrderDerivativeSiso:
 
     def _calculate_stable_transfer_function(self):
         # polynomial:
-        den = np.poly1d( [1, -pole] )
+        den = np.poly1d( [1, -self.pole] )
         for i in range(self.order):
             # den = [1 ..  a1 a0]
-            den *= np.poly1d( [1, -pole] )
+            den *= np.poly1d( [1, -self.pole] )
         self.den    = list(den) # indexing 'den' is non intuitive
         self.revden = self.den[::-1] # reversing
 
@@ -82,7 +82,7 @@ class kNOrderDerivativeSiso:
         for i in range(self.order+1):
             # when i==0, the system will be a LP filter to smooth the input
             # signal and enable the calculation of the derivatives.
-            C = np.zeros(order+1)
+            C = np.zeros(self.order+1)
             C[i] = 1.0
             
             # setup of discrete systems (filters):
