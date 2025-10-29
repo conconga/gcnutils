@@ -73,6 +73,7 @@ class kSosodeIntegrator:
         super().__init__(**kargs)
 
         self.curr_time = -1.0 # it shall start negative
+        self.state     = self.state0
 
     def update(self):
         """
