@@ -444,7 +444,6 @@ class kNavTransformations(kNavLib):
         """
 
         dLat     = self.dLat_dt(vN, lat_rad, h_m)
-        print("dLat = ", dLat)
         slat     = sin(lat_rad)
         clat     = cos(lat_rad)
         e2s2l2   = self.earth_e2 * slat**2.0
