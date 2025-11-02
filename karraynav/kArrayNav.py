@@ -400,6 +400,20 @@ class kNavTransformations(kNavLib):
             self.dLong_dt(vE, lat_rad, h_m),
             -vD ], hvector=False )
 
+    def w_ie_n(self, lat_rad):
+        """
+        Returns the angular velocity of the earth over the inertial frame, described at 'n'.
+
+        : parameter : lat_rad : [rad] latitude
+        """
+
+        wie = self.wie
+        return self.__class__( [
+            wie * cos(lat_rad),
+            0.0,
+            wie * sin(lat_rad)
+        ], hvector=False )
+
     def w_en_n(self, dLat_dt, dLong_dt, lat_rad):
         """
         Calculates the angular velocity of the navigation frame over the earth frame, described at 'n'.
@@ -415,19 +429,31 @@ class kNavTransformations(kNavLib):
             - dLong_dt * sin(lat_rad)
         ], hvector=False )
 
-    def w_ie_n(self, lat_rad):
+    def dWen_dt(self, lat_rad, vN, vE, vD, h_m, vNp, vEp):
         """
-        Returns the angular velocity of the earth over the inertial frame, described at 'n'.
+        Calculates the first derivative of w_en_n, i.e d(w_en_b)/dt.
+        (The expressions were obtained with sympy!)
 
-        : parameter : lat_rad : [rad] latitude
+        : parameter : lat_rad [rad]  latitude
+        : parameter : vN      [m/s]  velocity north
+        : parameter : vE      [m/s]  velocity east
+        : parameter : vD      [m/s]  velocity down
+        : parameter : h_m     [m]    height
+        : parameter : vNp     [m/s2] d(vN)/dt
+        : parameter : vEp     [m/s2] d(vE)/dt
         """
 
-        wie = self.wie
-        return self.__class__( [
-            wie * cos(lat_rad),
-            0.0,
-            wie * sin(lat_rad)
-        ], hvector=False )
+        dLat     = self.dLat_dt(vN, lat_rad, h_m)
+        print("dLat = ", dLat)
+        slat     = sin(lat_rad)
+        clat     = cos(lat_rad)
+        e2s2l2   = self.earth_e2 * slat**2.0
+
+        wp_en_x =  ((self.earth_a + sqrt(-e2s2l2 + 1.0)*h_m)*(-e2s2l2 + 1.0)*vEp - (1.0*self.earth_a*self.earth_e2*slat*clat*dLat + (-e2s2l2 + 1.0)**(3/2)*-vD)*vE)/((self.earth_a + sqrt(-e2s2l2 + 1.0)*h_m)**2*sqrt(-e2s2l2 + 1.0))
+        wp_en_y =  ((self.earth_a*(self.earth_e2 - 1.0) - (-e2s2l2 + 1.0)**1.5*h_m)*(-e2s2l2 + 1.0)**1.5*vNp - (-e2s2l2 + 1.0)**0.5*(1.5*self.earth_a*self.earth_e2*(self.earth_e2 - 1.0)*sin(2*lat_rad)*dLat - (-e2s2l2 + 1.0)**2.5*-vD)*vN)/(self.earth_a*(self.earth_e2 - 1.0) - (-e2s2l2 + 1.0)**1.5*h_m)**2
+        wp_en_z =  (-(self.earth_a + sqrt(-e2s2l2 + 1.0)*h_m)*(-e2s2l2 + 1.0)*vE*slat**2*dLat - (self.earth_a + sqrt(-e2s2l2 + 1.0)*h_m)*(-e2s2l2 + 1.0)*vE*clat**2*dLat - (self.earth_a + sqrt(-e2s2l2 + 1.0)*h_m)*(-e2s2l2 + 1.0)*slat*clat*vEp + (1.0*self.earth_a*self.earth_e2*slat*clat*dLat + (-e2s2l2 + 1.0)**(3/2)*-vD)*vE*slat*clat)/((self.earth_a + sqrt(-e2s2l2 + 1.0)*h_m)**2*sqrt(-e2s2l2 + 1.0)*clat**2)
+
+        return self.__class__( [ wp_en_x, wp_en_y, wp_en_z ], hvector=False )
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 class kArrayNav (kArray, kArrayLib, kNavTransformations):
