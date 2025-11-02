@@ -431,7 +431,7 @@ class kNavTransformations(kNavLib):
 
     def dWen_dt(self, lat_rad, vN, vE, vD, h_m, vNp, vEp):
         """
-        Calculates the first derivative of w_en_n, i.e d(w_en_b)/dt.
+        Calculates the first derivative of w_en_n, i.e d(w_en_n)/dt.
         (The expressions were obtained with sympy!)
 
         : parameter : lat_rad [rad]  latitude
