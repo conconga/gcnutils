@@ -285,7 +285,7 @@ class kNavTransformations(kNavLib):
             (RN + h) * cos(lat) * cos(lon),
             (RN + h) * cos(lat) * sin(lon),
             ((RN * (1.0 - self.earth_e2)) + h) * sin(lat)
-        ] )
+        ], hvector=False )
 
     def ecef_xyz2llh(self):
         """
