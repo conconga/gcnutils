@@ -170,7 +170,7 @@ class kArray (kArrayCommon):
     def __repr__(self):
         #txt = "<class {:s} ".format(str(self.__class__))
         #return txt + "{:s}>".format(self._do_format("f"))
-        return "{:s} = !{:s}!".format(str(self.__class__), self._do_format("f"))
+        return "{:s} |{:s}|".format(str(self.__class__.__name__), self._do_format("f"))
 
 
     def __format__(self, fmt):
