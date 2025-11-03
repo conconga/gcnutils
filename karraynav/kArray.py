@@ -273,7 +273,7 @@ class kArray (kArrayCommon):
             if ret.array.shape == (1,1):
                 ret = ret.array.squeeze().tolist()
 
-        elif isinstance(y, int) or isinstance(y, float):
+        elif isinstance(y, (int, float)):
             ret = self.__class__( self.array * y )
 
         else:
