@@ -1,4 +1,4 @@
-from karraynav import *
+from knavigation import *
 
 if __name__ == "__main__":
     tests = kArrayTests()
