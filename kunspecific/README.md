@@ -1,8 +1,6 @@
 -   [<span class="toc-section-number">1</span> kBase](#kbase)
 -   [<span class="toc-section-number">2</span> kDefault](#kdefault)
 -   [<span class="toc-section-number">3</span> kGenerator](#kgenerator)
-    -   [<span class="toc-section-number">3.1</span> Ts : sample period
-        \[s\]](#ts-sample-period-s)
 
 # kBase
 
@@ -40,7 +38,9 @@ provided configuration.  The necessary configuration is defined by the type of
 generator.
 
 Ts : sample period [s]
+
 --------------------------------------------------------------------------------
+
 typeGen == self.UNIFORM:
     Generates random steps with uniform distribution among min and max values.
 
@@ -50,6 +50,7 @@ typeGen == self.UNIFORM:
     ufn_firststep    : [s] zeros are sampled up to the firststep time
 
 --------------------------------------------------------------------------------
+
 typeGen == self.NORMAL:
     Generates random step with normal distribution among min and max
     values, and around the mean of these two values.
@@ -58,5 +59,6 @@ typeGen == self.NORMAL:
     ufn_sigma       : 1x standard deviation of the sampled value
 
     The other parameters from typeGen=UNIFORM apply here as well.
+
 --------------------------------------------------------------------------------
 
