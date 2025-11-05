@@ -1,0 +1,56 @@
+# kBase
+
+When defining the calling sequence to the initializer of parenting classes,
+python sets the last one to be the class `object`, whose `__init__` method does
+not take any argument. When the built-in method `super()` is used, and `kargs` is
+propagated to the last level, python will break stating it. 
+
+A workaround for the issue is to use a _dummy_ class as the last one before
+`object` just to receive `kargs`, but not to propagate it. This is what 
+`kBase` does.
+
+# kDefault
+
+This class is developed to extract, when possible, when available, items from
+`kargs`, and to display the default values that a particular instance of an object
+will adopt.
+
+For example, an object expects to be configured by three parameters, `a`, `b` and
+`c`. The developer decides to set a particular value to `b`, but he takes the 
+default value for the others. The method `__init__` would look like this:
+```
+class Object:
+    def __init__(self, **kargs):
+        dft = kDefault(**kargs)
+        self.a = dft("a", default=10)
+        self.b = dft("b", default=20)
+        self.c = dft("c", default=30)
+```
+
+# kGenerator
+
+This class generates sampled signals with particular characteristics based on
+provided configuration.  The necessary configuration is defined by the type of
+generator.
+
+Ts : sample period [s]
+--------------------------------------------------------------------------------
+typeGen == self.UNIFORM:
+    Generates random steps with uniform distribution among min and max values.
+
+    ufn_min          : minimal value allowed to be sampled
+    ufn_max          : maximal value allowed to be sampled
+    ufn_stepduration : [s] duration of each step
+    ufn_firststep    : [s] zeros are sampled up to the firststep time
+
+--------------------------------------------------------------------------------
+typeGen == self.NORMAL:
+    Generates random step with normal distribution among min and max
+    values, and around the mean of these two values.
+
+    ufn_* as UNIFORM
+    ufn_sigma       : 1x standard deviation of the sampled value
+
+    The other parameters from typeGen=UNIFORM apply here as well.
+--------------------------------------------------------------------------------
+
