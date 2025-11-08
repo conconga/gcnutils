@@ -222,6 +222,16 @@ class kSignalGenerator (kSignalTypes):
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 if __name__ == "__main__":
     import matplotlib.pylab as plt
+    SMALL_SIZE = 7
+    MEDIUM_SIZE = 9
+    BIGGER_SIZE = 11
+    plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+    plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
+    plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+    plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+    plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
     sample_freq_Hz = 100
     max_time       = 20
@@ -245,11 +255,13 @@ if __name__ == "__main__":
 
     plt.figure(1).clf()
     fig,ax = plt.subplots(3,1,num=1)
+    fig.set_size_inches(5,4)
     for i,j in enumerate( [log_uniform, log_normal, log_step] ):
         ax[i].plot(log_time, j)
         ax[i].grid(True)
         ax[i].set_ylabel([ 'uniform', 'normal', 'step' ][i] )
 
     plt.show(block=False)
+    plt.savefig("output_kGen.png")
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
