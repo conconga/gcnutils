@@ -17,6 +17,10 @@ import numpy as np
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 #                                                                                  #
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
+class kSignalTypes:
+    UNIFORM = 1
+    NORMAL  = 2
+    STEP    = 3
 class kSignalGeneratorCommonUniformNormal:
     def __init__(self, **kargs):
         assert kargs["ufn_stepduration"] > 0
