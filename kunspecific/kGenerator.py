@@ -221,26 +221,35 @@ class kSignalGenerator (kSignalTypes):
 #                                                                                  #
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 if __name__ == "__main__":
+    import matplotlib.pylab as plt
 
-        sample_freq_Hz = 3
-        max_time       = 4.1
-        dt             = 1./sample_freq_Hz
-        max_time       = max_time
-        signal_uf      = kSignalGenerator(dt, kSignalGenerator.UNIFORM, ufn_min=1, ufn_max=1.3, ufn_stepduration=0.8, ufn_firststep=0.2)
-        signal_g       = kSignalGenerator(dt, kSignalGenerator.NORMAL, ufn_min=1, ufn_max=1.3, ufn_stepduration=0.8, ufn_firststep=0.2, ufn_sigma=0.2)
+    sample_freq_Hz = 100
+    max_time       = 20
+    dt             = 1./sample_freq_Hz
+    max_time       = max_time
+    signal_uniform = kSignalGenerator(dt, kSignalTypes.UNIFORM, ufn_min=1, ufn_max=1.3, ufn_stepduration=0.8, ufn_firststep=0.2)
+    signal_normal  = kSignalGenerator(dt, kSignalTypes.NORMAL, ufn_min=1, ufn_max=1.3, ufn_stepduration=0.8, ufn_firststep=0.2, ufn_sigma=0.2)
+    signal_step    = kSignalGenerator(dt, kSignalTypes.STEP, ufn_low=-3, ufn_lowduration=1, ufn_high=3, ufn_highduration=4, ufn_firststep=1.5)
 
-        time = 0.0
-        print()
-        print("** UNIFORM **")
-        while time < max_time:
-            time += dt
-            print("{:1.2f} :  {:1.02f}".format(*signal_uf.get_next_sample()))
+    time = 0.0
+    log_time    = list()
+    log_uniform = list()
+    log_normal  = list()
+    log_step    = list()
+    while time < max_time:
+        time += dt
+        log_time.append(time)
+        log_uniform.append(signal_uniform.get_next_sample()[1])
+        log_normal.append(signal_normal.get_next_sample()[1])
+        log_step.append(signal_step.get_next_sample()[1])
 
-        time = 0.0
-        print()
-        print("** NORMAL **")
-        while time < max_time:
-            time += dt
-            print("{:1.2f} :  {:1.02f}".format(*signal_g.get_next_sample()))
+    plt.figure(1).clf()
+    fig,ax = plt.subplots(3,1,num=1)
+    for i,j in enumerate( [log_uniform, log_normal, log_step] ):
+        ax[i].plot(log_time, j)
+        ax[i].grid(True)
+        ax[i].set_ylabel([ 'uniform', 'normal', 'step' ][i] )
+
+    plt.show(block=False)
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
