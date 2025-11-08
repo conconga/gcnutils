@@ -21,16 +21,12 @@ class kSignalTypes:
     UNIFORM = 1
     NORMAL  = 2
     STEP    = 3
-class kSignalGeneratorCommonUniformNormal:
+
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
+#                                                                                  #
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
+class kSignalGeneratorUpdate (kSignalTypes):
     def __init__(self, **kargs):
-        assert kargs["ufn_stepduration"] > 0
-        assert kargs["ufn_max"] > kargs["ufn_min"]
-
-        self.ufn_min          = kargs["ufn_min"]
-        self.ufn_max          = kargs["ufn_max"]
-        self.ufn_stepduration = kargs["ufn_stepduration"]
-        self.ufn_firststep    = kargs["ufn_firststep"]
-
         self.time_last_sample = -1.0
 
     def update(self, t):
@@ -41,17 +37,31 @@ class kSignalGeneratorCommonUniformNormal:
             # first sample:
             if t < self.ufn_firststep:
                 self.last_sample = 0.0
-                self.time_next_change = self.ufn_firststep
+                if self.typeGen in (self.UNIFORM, self.NORMAL, self.STEP):
+                    self.time_next_change = self.ufn_firststep
+                else:
+                    raise(NameError("still not supported"))
             else:
                 self.last_sample = self._sample()
-                self.time_next_change = self.ufn_stepduration
+                if self.typeGen in (self.UNIFORM, self.NORMAL):
+                    self.time_next_change = self.ufn_stepduration
+                elif self.typeGen == self.STEP:
+                    self.time_next_change = self.ufn_highduration
             #print("time_next_change = {:f}".format(self.time_next_change))
 
         elif t > self.time_next_change:
-            self.last_sample = self._sample()
             while self.time_next_change < t:
-                self.time_next_change += self.ufn_stepduration
+                # even if the new sample is not necessary, the call to a new
+                # sample might change some internal state.
+                self.last_sample = self._sample()
+
+                if self.typeGen in (self.UNIFORM, self.NORMAL):
+                    self.time_next_change += self.ufn_stepduration
+                else:
+                    self.time_next_change += \
+                            self.ufn_highduration if self.current_state == "high" else self.ufn_lowduration
             #print("time_next_change = {:f}".format(self.time_next_change))
+
         else:
             # no new sample; no change
             pass
@@ -62,9 +72,19 @@ class kSignalGeneratorCommonUniformNormal:
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 #                                                                                  #
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
-class kSignalGeneratorUniform (kSignalGeneratorCommonUniformNormal):
+class kSignalGeneratorUniform (kSignalGeneratorUpdate):
     def __init__(self, **kargs):
         super().__init__(**kargs)
+        self.typeGen = self.UNIFORM
+
+        assert kargs["ufn_stepduration"] > 0
+        assert kargs["ufn_max"] > kargs["ufn_min"]
+
+        self.ufn_min          = kargs["ufn_min"]
+        self.ufn_max          = kargs["ufn_max"]
+        self.ufn_stepduration = kargs["ufn_stepduration"]
+        self.ufn_firststep    = kargs["ufn_firststep"]
+
 
     def _sample(self):
         return self.ufn_min + ((self.ufn_max - self.ufn_min) * np.random.rand())
@@ -72,11 +92,19 @@ class kSignalGeneratorUniform (kSignalGeneratorCommonUniformNormal):
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 #                                                                                  #
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
-class kSignalGeneratorNormal (kSignalGeneratorCommonUniformNormal):
+class kSignalGeneratorNormal (kSignalGeneratorUpdate):
     def __init__(self, **kargs):
         super().__init__(**kargs)
+        self.typeGen = self.NORMAL
 
-        self.ufn_sigma = kargs["ufn_sigma"]
+        assert kargs["ufn_stepduration"] > 0
+        assert kargs["ufn_max"] > kargs["ufn_min"]
+
+        self.ufn_min          = kargs["ufn_min"]
+        self.ufn_max          = kargs["ufn_max"]
+        self.ufn_stepduration = kargs["ufn_stepduration"]
+        self.ufn_firststep    = kargs["ufn_firststep"]
+        self.ufn_sigma        = kargs["ufn_sigma"]
 
     def _sample(self):
         mean = 0.5 * (self.ufn_max + self.ufn_min)
@@ -91,9 +119,39 @@ class kSignalGeneratorNormal (kSignalGeneratorCommonUniformNormal):
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 #                                                                                  #
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
-class kSignalGenerator:
-    UNIFORM = 1
-    NORMAL  = 2
+class kSignalGeneratorStep (kSignalGeneratorUpdate):
+    def __init__(self, **kargs):
+        super().__init__(**kargs)
+        self.typeGen = self.STEP
+
+        assert kargs["ufn_low"] < kargs["ufn_high"]
+        assert kargs["ufn_highduration"] >= 0
+        assert kargs["ufn_lowduration"] >= 0
+        assert kargs["ufn_firststep"] >= 0
+
+        self.ufn_low          = kargs["ufn_low"]
+        self.ufn_high         = kargs["ufn_high"]
+        self.ufn_highduration = kargs["ufn_highduration"]
+        self.ufn_lowduration  = kargs["ufn_lowduration"]
+        self.ufn_firststep    = kargs["ufn_firststep"]
+
+        self.current_state = "low"
+
+    def _sample(self):
+        if self.current_state == "low":
+            self.current_state = "high"
+            out = self.ufn_high
+        else:
+            self.current_state = "low"
+            out = self.ufn_low
+
+        return out
+
+
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
+#                                                                                  #
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
+class kSignalGenerator (kSignalTypes):
 
     def __init__(self, Ts, typeGen=None, **kargs):
         """
@@ -119,16 +177,30 @@ class kSignalGenerator:
             ufn_* as UNIFORM
             ufn_sigma       : 1x standard deviation of the sampled value
         --------------------------------------------------------------------------------
+        typeGen == self.STEP:
+            Generates a sequence of steps with same amplitude either low or high.
+
+            ufn_low          : amplitude of low level
+            ufn_high         : amplitude of high level
+            ufn_highduration : [s] duration at high level
+            ufn_lowduration  : [s] duration at low level
+            ufn_firststep    : [s] low level is sampled up to the firststep time
+        --------------------------------------------------------------------------------
         """
 
         assert Ts > 0
         self.Ts        = Ts
         self.curr_time = -1.0 # negative to force a sample at t=0
 
+        # backup:
+        self.typeGen = typeGen
+
         if typeGen == self.UNIFORM:
             self.obj = kSignalGeneratorUniform( **kargs )
         elif typeGen == self.NORMAL:
             self.obj = kSignalGeneratorNormal( **kargs )
+        elif typeGen == self.STEP:
+            self.obj = kSignalGeneratorStep( **kargs )
         else:
             raise(NameError("this type of signal is still not supported"))
 
