@@ -24,12 +24,12 @@ class kDefault:
         self.kargs = kargs
         #super().__init__(**kargs)
 
-    def get(self, txt, default=None):
+    def get(self, txt, default=[]):
         """
         Returns the configuration from `kargs` tagged with `txt`. If this key
         is not availble, then returns the default value.
         """
-        assert default is not None
+        assert default is not []
 
         try:
             ret = self.kargs[txt]
