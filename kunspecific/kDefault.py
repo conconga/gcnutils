@@ -38,6 +38,9 @@ class kDefault:
 
         return ret
 
+    def __call__(self, *args):
+        return self.get(*args)
+
     def show(self, len_header, str_header, str_value, str_unit=None):
         """
         Prints a log line with this format:
