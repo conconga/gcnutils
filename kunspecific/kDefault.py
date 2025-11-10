@@ -47,13 +47,13 @@ class kDefault:
 
                               |- len_header
         0---------------------|---------------------------------....
-        >>         str_header = str_value [str_unit]
+        |          str_header = str_value [str_unit]
         """
         
         if str_unit is None:
-            print(">>{{:>{:d}s}} = {{:s}}".format(len_header-4).format(str_header, str_value))
+            print("|{{:>{:d}s}} = {{:s}}".format(len_header-3).format(str_header, str_value))
         else:
-            print(">>{{:>{:d}s}} = {{:s}} [{{:s}}]".format(len_header-4).format(str_header, str_value, str_unit))
+            print("|{{:>{:d}s}} = {{:s}} [{{:s}}]".format(len_header-3).format(str_header, str_value, str_unit))
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 if __name__ == "__main__":
