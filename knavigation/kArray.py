@@ -155,23 +155,20 @@ class kArray (kArrayCommon, np.ndarray):
         pass
 
     def __array_finalize__(self, obj) -> None:
+        """
+        Stattdessen wird array_finalize von NumPy selbst bei
+        View-/Slicing-Operationen aufgerufen und sollte Attribute von obj
+        kopieren oder initialisieren.
+
+        Wird aufgerufen bei Slicing, uvm.
+        """
+
         if obj is None: return
+
         # This attribute should be maintained!
         default_attributes = {"attr": 1}
-        self.__dict__.update(default_attributes)  # another way to set attributes
+        self.__dict__.update(default_attributes)
 
-    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):  # this method is called whenever you use a ufunc
-        f = {
-                "reduce": ufunc.reduce,
-                "accumulate": ufunc.accumulate,
-                "reduceat": ufunc.reduceat,
-                "outer": ufunc.outer,
-                "at": ufunc.at,
-                "__call__": ufunc,
-        }
-        output = ExampleTensor(f[method](*(i.view(np.ndarray) for i in inputs), **kwargs))  # convert the inputs to np.ndarray to prevent recursion, call the function, then cast it back as ExampleTensor
-        output.__dict__ = self.__dict__  # carry forward attributes
-        return output
 
 class _kArray (kArrayCommon):
     def __init__(self, *args, hvector=None):
