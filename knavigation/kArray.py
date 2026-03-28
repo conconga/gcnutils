@@ -94,8 +94,65 @@ class kArrayCommon:
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 class kArray (kArrayCommon, np.ndarray):
-    def __new__(cls, input_array):
-        return np.asarray(input_array).view(cls)
+
+    def __new__(cls, *args, hvector=None):
+        """
+        When 'val' is given as a list, 'hvector' is used to indicate whether the
+        vector to be created is horizontal (row, True) or vertical (column, False).
+
+        If no positional value is provided, the object will create a matrix [1x1] with a single zero.
+        If 'hvector' is None, then the selection is automatic when possible.
+        """
+
+        assert len(args) in [0,1]
+        if len(args) == 0:
+            # empty matrix:
+            val = [0,]
+        else:
+            val = args[0]
+
+        if isinstance(val, (list, tuple)):
+            val = np.asarray( val )
+        elif isinstance(val, (int, float)):
+            val = np.asarray( [val] )
+        else:
+            # i guess the input is already an array
+            pass
+
+        # input type, vertical or horizontal or single?
+        vtype = cls._type(val)
+        assert 1 <= len(val.shape) <= 2
+
+        if vtype == cls.TYPE_ARRAY:
+            obj = np.asarray(args[0]).view(cls)
+
+        elif vtype in [ cls.TYPE_HORIZONTAL, cls.TYPE_VERTICAL ]:
+            if hvector == True:
+                obj = val.squeeze().reshape(1,-1).view(cls)
+            elif hvector == False:
+                obj = val.squeeze().reshape(-1,1).view(cls)
+            else: # hvector==None
+                if vtype == cls.TYPE_HORIZONTAL:
+                    obj = val.squeeze().reshape(1,-1).view(cls)
+                else:
+                    obj = val.squeeze().reshape(-1,1).view(cls)
+
+        elif vtype == cls.TYPE_SINGLEVALUE:
+            obj = val.squeeze().reshape(1,1).view(cls)
+
+        else:
+            print("::error::")
+            print(val)
+            print(vtype)
+            raise(NameError("what is this?"))
+
+        # casting to float to avoid issues like [1,2,3]+3.0 ==> CastingError
+        obj = obj.astype(float)
+
+        return obj
+
+    def __init__(self, *args, **kargs):
+        pass
 
     def __array_finalize__(self, obj) -> None:
         if obj is None: return
