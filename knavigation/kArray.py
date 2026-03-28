@@ -169,6 +169,9 @@ class kArray (kArrayCommon, np.ndarray):
         default_attributes = {"attr": 1}
         self.__dict__.update(default_attributes)
 
+    def __format__(self, fmt):
+        return self._do_format(fmt)
+
 
 class _kArray (kArrayCommon):
     def __init__(self, *args, hvector=None):
