@@ -527,7 +527,7 @@ class kArrayTests:
 
         print("==== norm ====")
         a = kArray([1,1])
-        assert abs(abs(a) - math.sqrt(2)) < 1e-10
+        assert abs(a.norm() - math.sqrt(2)) < 1e-10
         print("||a|| = {:f}".format(abs(a)))
         a = kArray(-32)
         assert abs(abs(a) - 32.0) < 1e-10
