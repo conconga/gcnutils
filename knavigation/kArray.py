@@ -172,6 +172,38 @@ class kArray (kArrayCommon, np.ndarray):
     def __format__(self, fmt):
         return self._do_format(fmt)
 
+    # NumPy implements matrix multiplication other than we learn in the school.
+    # Here I will bring it back.
+    def __mul__(self, y):
+        if isinstance(y, self.__class__):
+            axb = self @ y
+            ret = axb.view(self.__class__)
+
+            # last check: if `ret` is a matrix [1x1], then return a float:
+            if ret.shape in [(1), (1,1)]:
+                ret = float(ret.squeeze())
+
+        elif isinstance(y, (int, float)):
+            ret = super().__mul__(y)
+
+        else:
+            raise(NameError("not prepared for type '{:s}'".format(str(type(y)))))
+
+        return ret
+
+    def __rmul__(self, y):
+        # if y were a matrix, then __mul__() would be called by the matrix.
+        return self * y
+    #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
+
+    def norm(self):
+        vtype = self._type(self)
+        if vtype in [ self.TYPE_HORIZONTAL, self.TYPE_VERTICAL ]:
+            return math.sqrt( sum( [i**2 for i in self.squeeze()] ))
+        elif vtype == self.TYPE_SINGLEVALUE:
+            return abs(self.squeeze())
+        else:
+            raise(NameError("not prepared for type '{:s}'".format(str(type(y)))))
 
 class _kArray (kArrayCommon):
     def __init__(self, *args, hvector=None):
