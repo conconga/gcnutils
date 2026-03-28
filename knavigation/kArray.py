@@ -55,21 +55,11 @@ class kArrayCommon:
             print(val)
             raise(NameError("I am not prepared for this array"))
 
-
-    #def _do_format_1D(self, fmt, C):
-    #    txt = "[ "
-    #    for c in range(C):
-    #        txt += "{{:{:s}}}".format(fmt).format(self.array[c])
-    #        if c < (C-1):
-    #            txt += ", "
-    #    txt += " ]{:s}".format("" if self.hvector else ".T")
-    #    return txt
-
     def _do_format_2D(self, fmt, R, C):
         txt = "[ ["
         for r in range(R):
             for c in range(C):
-                txt += "{{:{:s}}}".format(fmt).format(self.array[r,c])
+                txt += "{{:{:s}}}".format(fmt).format(self[r,c])
                 if c < (C-1):
                     txt += ", "
             if r < (R-1):
@@ -104,13 +94,16 @@ class kArrayCommon:
         ret = True
         y   = kArray(y)
 
-        if self.array.shape != y.array.shape:
+        if self.shape != y.shape:
             ret = False
 
         if not all( [ abs(i-j) <= max( [abs(i), abs(j)] )*tol for i,j in zip(self, y) ] ):
             ret = False
 
         return ret
+
+    def __ne__(self, y):
+        return not self.__eq__(y)
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 class kArray (kArrayCommon, np.ndarray):
