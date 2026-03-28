@@ -71,23 +71,9 @@ class kArrayCommon:
         return txt
 
     def _do_format(self, fmt):
-        size  = self.array.shape
-        vtype = self._type(self.array)
+        size  = self.shape
         txt = self._do_format_2D(fmt, *size)
         return txt
-
-    #( --- indexing ---)#
-    def __getitem__(self, idx):
-        if isinstance(idx, int):
-            return self.array[idx]
-        else:
-            return self.array[*idx]
-
-    def __setitem__(self, idx, val):
-        if isinstance(idx, int):
-            self.array[idx] = val
-        else:
-            self.array[*idx] = val
 
     #( --- miscelaneous --- )#
     def __eq__(self, y):
