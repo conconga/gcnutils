@@ -205,6 +205,13 @@ class kArray (kArrayCommon, np.ndarray):
         else:
             raise(NameError("not prepared for type '{:s}'".format(str(type(y)))))
 
+    #( --- iter --- )#
+    def __iter__(self):
+        temp = self.reshape(-1).tolist()
+        for i in temp:
+            yield i
+
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 class _kArray (kArrayCommon):
     def __init__(self, *args, hvector=None):
         """
