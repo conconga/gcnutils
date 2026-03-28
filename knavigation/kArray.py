@@ -24,7 +24,8 @@ class kArrayCommon:
     TYPE_HORIZONTAL  = 2
     TYPE_SINGLEVALUE = 3
 
-    def _type(self, val):
+    @classmethod
+    def _type(cls, val):
         """
             TYPE_ARRAY       = 2D array
             TYPE_VERTICAL    = vertical vector
@@ -38,18 +39,18 @@ class kArrayCommon:
         size = val.shape
         if len(size) == 1:
             if size[0] == 1:
-                return self.TYPE_SINGLEVALUE
+                return cls.TYPE_SINGLEVALUE
             else:
-                return self.TYPE_HORIZONTAL
+                return cls.TYPE_HORIZONTAL
         elif len(size) == 2:
             if size == (1,1):
-                return self.TYPE_SINGLEVALUE
+                return cls.TYPE_SINGLEVALUE
             if size[0] == 1:
-                return self.TYPE_HORIZONTAL
+                return cls.TYPE_HORIZONTAL
             elif size[1] == 1:
-                return self.TYPE_VERTICAL
+                return cls.TYPE_VERTICAL
             else:
-                return self.TYPE_ARRAY
+                return cls.TYPE_ARRAY
         else:
             print("::error::")
             print(val)
