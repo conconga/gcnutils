@@ -22,9 +22,9 @@ from .kNavLib import kNavLib
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 class kArrayLib:
     def to_skew(self):
-        vtype = self._type(self.array)
+        vtype = self._type(self)
         if vtype in [ self.TYPE_HORIZONTAL, self.TYPE_VERTICAL ]:
-            val  = self.array.squeeze()
+            val  = self.squeeze()
             assert len(val) == 3
             return self.__class__( [
                 [0, -val[2], val[1]],
@@ -42,8 +42,8 @@ class kArrayLib:
         """
         assert self.shape == (3,1)
         assert y.shape == (3,1)
-        a = self.array.squeeze()
-        b = y.array.squeeze()
+        a = self.squeeze()
+        b = y.squeeze()
 
         return self.__class__( [
             (a[1]*b[2]) - (a[2]*b[1]),
@@ -58,17 +58,17 @@ class kArrayLib:
         : returns a new object with the result of 'fn'
         """
 
-        return self.__class__( fn(self.array) )
+        return self.__class__( fn(self) )
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 class kNavTransformations(kNavLib):
 
     def to_deg(self):
-        return self.__class__(self.array * 180. / pi)
+        return self.__class__(self * 180. / pi)
         #return val * 180. / pi
 
     def to_rad(self):
-        return self.__class__(self.array * pi / 180.)
+        return self.__class__(self * pi / 180.)
         #return val * pi / 180.
 
     def euler2Q(self):
@@ -80,7 +80,7 @@ class kNavTransformations(kNavLib):
         : parameter : psi   [rad]
         : return: kArray = Q4
         """
-        array = self.array.squeeze()
+        array = self.squeeze()
         assert len(array) == 3
         phi   = array[0]
         theta = array[1]
@@ -107,7 +107,7 @@ class kNavTransformations(kNavLib):
         : return: kArray( [phi, theta, psi] )
         """
 
-        q     = self.array.squeeze()
+        q     = self.squeeze()
         assert len(q) == 4
 
         phi   = atan2(2.0*((q[2]*q[3])+(q[0]*q[1])), (q[0]**2.0)-(q[1]**2.0)-(q[2]**2.0)+(q[3]**2.0));
@@ -131,7 +131,7 @@ class kNavTransformations(kNavLib):
         : output   : C
         """
 
-        q = self.array.squeeze()
+        q = self.squeeze()
         assert len(q) == 4
 
         C = kArray( np.empty((3,3)) )
@@ -154,7 +154,7 @@ class kNavTransformations(kNavLib):
         Navigation -- from C to (phi,theta,psi)[rad]
         """
 
-        C = self.array
+        C = self
         assert C.shape == (3,3)
         assert(C[2,2] != 0)
         assert(C[0,0] != 0)
@@ -172,7 +172,7 @@ class kNavTransformations(kNavLib):
         : order = [phi, theta, psi] [rad]
         """
 
-        a = self.array.squeeze()
+        a = self.squeeze()
         assert len(a) == 3
 
         if False:
@@ -211,8 +211,8 @@ class kNavTransformations(kNavLib):
         """
         Calculates the inverse of a quaternion. This is similar to inverting a transformation matrix.
         """
-        shape = self.array.shape
-        tmp   = self.array.squeeze().tolist()
+        shape = self.shape
+        tmp   = self.squeeze().tolist()
         ret   = [tmp[0]] + [-i for i in tmp[1:]]
         return self.__class__( np.asarray(ret).reshape(shape) / sum( [i**2 for i in ret] ))
 
@@ -226,11 +226,11 @@ class kNavTransformations(kNavLib):
 
         output: np.array quaternion q3=q1.q2
         """
-        q1 = self.array.squeeze()
+        q1 = self.squeeze()
         assert len(q1) == 4
 
         if isinstance(q2, kArrayNav) or isinstance(kArray):
-            q2 = q2.array.squeeze()
+            q2 = q2.squeeze()
         assert len(q2) == 4
 
         q3 = np.array([
@@ -272,7 +272,7 @@ class kNavTransformations(kNavLib):
         : output  : xzy_e [m]
         """
 
-        geo = self.array.squeeze()
+        geo = self.squeeze()
         assert len(geo) == 3
         lat = geo[0]
         lon = geo[1]
@@ -294,7 +294,7 @@ class kNavTransformations(kNavLib):
         : output : llh  = (lat_rad, lon_rad, h_m)
         """
 
-        rect = self.array.squeeze()
+        rect = self.squeeze()
         assert len(rect) == 3
         x = rect[0]
         y = rect[1]
@@ -363,7 +363,7 @@ class kNavTransformations(kNavLib):
         : return : d[phi, theta, psi]/dt [rad/s]
         """
 
-        a = self.array.squeeze()
+        a = self.squeeze()
         assert len(a) == 3
         phi    = a[0]
         theta  = a[1]
@@ -372,7 +372,7 @@ class kNavTransformations(kNavLib):
         if isinstance(w, list):
             b = w
         elif isinstance(w, self.__class__):
-            b = w.array.squeeze().tolist()
+            b = w.squeeze().tolist()
         else:
             raise(NameError("this type is still not supported"))
 
