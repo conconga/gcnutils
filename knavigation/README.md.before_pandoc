@@ -127,14 +127,8 @@ a = kArrayNav( [[2,0,0],[0,4,0],[0,0,10]] )
 b = a.apply(lambda x: np.linalg.inv(x))
 ```
 
-# How to use
-```
-import sys
-sys.path.append(< up to where folder karraynav is >)
-from karraynav import kArrayNav
-```
+Note: the class `kArrayNav` includes a `.inv()` method anyhow.. 
 
 # How to test it
-```
-kArrayNavTests().do_tests()
-```
+
+In the folder `tests/` call `pytest`
