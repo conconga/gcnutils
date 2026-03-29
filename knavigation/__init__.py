@@ -1,5 +1,5 @@
-from .kArray    import kArrayTests
-from .kArrayNav import kArrayNav, kNavLib, kArrayNavTests
+from .kArray    import kArray
+from .kArrayNav import kArrayNav, kNavLib
 from .kNavLib   import kNavLib
 
 __version__ = "1.0.0"
