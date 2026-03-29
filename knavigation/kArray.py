@@ -92,6 +92,9 @@ class kArrayCommon:
     def __ne__(self, y):
         return not self.__eq__(y)
 
+    def to_list(self):
+        return self.tolist()
+
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 class kArray (kArrayCommon, np.ndarray):
 
