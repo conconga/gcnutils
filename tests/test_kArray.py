@@ -224,6 +224,19 @@ class TestClass_kArray:
         if not ok:
             raise(NameError("it should not reach here"))
 
+    def test_matrix_inv(self):
+        print("==== inv() ====")
+        M = [[1,2,3], [40,5,6], [7,8,9]]
+        #M = np.random.randn(3,3)
+        a = kArray(M)
+        b = kArray(M)
+        identity = a.inv() * b
+        for i in range(3):
+            for j in range(3):
+                if i == j:
+                    assert abs(identity[i,j] - 1.0) < 1e-10
+                else:
+                    assert abs(identity[i,j]) < 1e-10
 
     def test_matrix_indexing(self):
         print("==== indexing ====")
