@@ -93,7 +93,7 @@ class kArrayCommon:
         return not self.__eq__(y)
 
     def to_list(self):
-        return self.tolist()
+        return self.reshape(-1).tolist()
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 class kArray (kArrayCommon, np.ndarray):
