@@ -10,6 +10,7 @@ sys.path.append("..")
 from knavigation import *
 import numpy as np
 from numpy import pi
+from math import sqrt
 #import math
 
 
