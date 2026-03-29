@@ -24,7 +24,8 @@ class kArrayCommon:
     TYPE_HORIZONTAL  = 2
     TYPE_SINGLEVALUE = 3
 
-    def _type(self, val):
+    @classmethod
+    def _type(cls, val):
         """
             TYPE_ARRAY       = 2D array
             TYPE_VERTICAL    = vertical vector
@@ -38,38 +39,28 @@ class kArrayCommon:
         size = val.shape
         if len(size) == 1:
             if size[0] == 1:
-                return self.TYPE_SINGLEVALUE
+                return cls.TYPE_SINGLEVALUE
             else:
-                return self.TYPE_HORIZONTAL
+                return cls.TYPE_HORIZONTAL
         elif len(size) == 2:
             if size == (1,1):
-                return self.TYPE_SINGLEVALUE
+                return cls.TYPE_SINGLEVALUE
             if size[0] == 1:
-                return self.TYPE_HORIZONTAL
+                return cls.TYPE_HORIZONTAL
             elif size[1] == 1:
-                return self.TYPE_VERTICAL
+                return cls.TYPE_VERTICAL
             else:
-                return self.TYPE_ARRAY
+                return cls.TYPE_ARRAY
         else:
             print("::error::")
             print(val)
             raise(NameError("I am not prepared for this array"))
 
-
-    #def _do_format_1D(self, fmt, C):
-    #    txt = "[ "
-    #    for c in range(C):
-    #        txt += "{{:{:s}}}".format(fmt).format(self.array[c])
-    #        if c < (C-1):
-    #            txt += ", "
-    #    txt += " ]{:s}".format("" if self.hvector else ".T")
-    #    return txt
-
     def _do_format_2D(self, fmt, R, C):
         txt = "[ ["
         for r in range(R):
             for c in range(C):
-                txt += "{{:{:s}}}".format(fmt).format(self.array[r,c])
+                txt += "{{:{:s}}}".format(fmt).format(self[r,c])
                 if c < (C-1):
                     txt += ", "
             if r < (R-1):
@@ -80,31 +71,17 @@ class kArrayCommon:
         return txt
 
     def _do_format(self, fmt):
-        size  = self.array.shape
-        vtype = self._type(self.array)
+        size  = self.shape
         txt = self._do_format_2D(fmt, *size)
         return txt
-
-    #( --- indexing ---)#
-    def __getitem__(self, idx):
-        if isinstance(idx, int):
-            return self.array[idx]
-        else:
-            return self.array[*idx]
-
-    def __setitem__(self, idx, val):
-        if isinstance(idx, int):
-            self.array[idx] = val
-        else:
-            self.array[*idx] = val
 
     #( --- miscelaneous --- )#
     def __eq__(self, y):
         tol = 1e-10
         ret = True
-        y   = kArray(y)
+        y   = self.__class__(y)
 
-        if self.array.shape != y.array.shape:
+        if self.shape != y.shape:
             ret = False
 
         if not all( [ abs(i-j) <= max( [abs(i), abs(j)] )*tol for i,j in zip(self, y) ] ):
@@ -112,9 +89,16 @@ class kArrayCommon:
 
         return ret
 
+    def __ne__(self, y):
+        return not self.__eq__(y)
+
+    def to_list(self):
+        return self.reshape(-1).tolist()
+
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
-class kArray (kArrayCommon):
-    def __init__(self, *args, hvector=None):
+class kArray (kArrayCommon, np.ndarray):
+
+    def __new__(cls, *args, hvector=None):
         """
         When 'val' is given as a list, 'hvector' is used to indicate whether the
         vector to be created is horizontal (row, True) or vertical (column, False).
@@ -134,29 +118,30 @@ class kArray (kArrayCommon):
             val = np.asarray( val )
         elif isinstance(val, (int, float)):
             val = np.asarray( [val] )
-        elif isinstance(val, kArray):
-            val = val.array
+        else:
+            # i guess the input is already an array
+            pass
 
-        shape = val.shape
-        assert 1 <= len(shape) <= 2
-        vtype = self._type(val)
+        # input type, vertical or horizontal or single?
+        vtype = cls._type(val)
+        assert 1 <= len(val.shape) <= 2
 
-        if vtype == self.TYPE_ARRAY:
-            self.array = val
+        if vtype == cls.TYPE_ARRAY:
+            obj = np.asarray(args[0]).view(cls)
 
-        elif vtype in [ self.TYPE_HORIZONTAL, self.TYPE_VERTICAL ]:
+        elif vtype in [ cls.TYPE_HORIZONTAL, cls.TYPE_VERTICAL ]:
             if hvector == True:
-                self.array = val.squeeze().reshape(1,-1)
+                obj = val.squeeze().reshape(1,-1).view(cls)
             elif hvector == False:
-                self.array = val.squeeze().reshape(-1,1)
+                obj = val.squeeze().reshape(-1,1).view(cls)
             else: # hvector==None
-                if vtype == self.TYPE_HORIZONTAL:
-                    self.array = val.squeeze().reshape(1,-1)
+                if vtype == cls.TYPE_HORIZONTAL:
+                    obj = val.squeeze().reshape(1,-1).view(cls)
                 else:
-                    self.array = val.squeeze().reshape(-1,1)
+                    obj = val.squeeze().reshape(-1,1).view(cls)
 
-        elif vtype == self.TYPE_SINGLEVALUE:
-            self.array = val.squeeze().reshape(1,1)
+        elif vtype == cls.TYPE_SINGLEVALUE:
+            obj = val.squeeze().reshape(1,1).view(cls)
 
         else:
             print("::error::")
@@ -164,373 +149,75 @@ class kArray (kArrayCommon):
             print(vtype)
             raise(NameError("what is this?"))
 
-        #print("self.array =")
-        #print(self.array)
+        # casting to float to avoid issues like [1,2,3]+3.0 ==> CastingError
+        obj = obj.astype(float)
+
+        return obj
 
     def __repr__(self):
-        #txt = "<class {:s} ".format(str(self.__class__))
-        #return txt + "{:s}>".format(self._do_format("f"))
         return "{:s} |{:s}|".format(str(self.__class__.__name__), self._do_format("f"))
 
+    def __init__(self, *args, **kargs):
+        pass
+
+    def __array_finalize__(self, obj) -> None:
+        """
+        Stattdessen wird array_finalize von NumPy selbst bei
+        View-/Slicing-Operationen aufgerufen und sollte Attribute von obj
+        kopieren oder initialisieren.
+
+        Wird aufgerufen bei Slicing, uvm.
+        """
+
+        if obj is None: return
+
+        # This attribute should be maintained!
+        default_attributes = {"attr": 1}
+        self.__dict__.update(default_attributes)
 
     def __format__(self, fmt):
         return self._do_format(fmt)
 
-    @property
-    def T(self):
-        vtype = self._type(self.array)
-        if vtype == self.TYPE_HORIZONTAL:
-            return self.__class__( self.array, hvector=False )
-        elif vtype == self.TYPE_VERTICAL:
-            return self.__class__( self.array, hvector=True )
-        else:
-            return self.__class__( self.array.T )
-
-    @property
-    def shape(self):
-        return self.array.shape
-
-    #( --- call --- )#
-    def __call__(self):
-        return self.array
-
-    #( --- iter --- )#
-    def __iter__(self):
-        if self._type(self.array) == self.TYPE_SINGLEVALUE:
-            yield float(self.array.squeeze())
-        else:
-            temp = self.array.reshape(1,-1).squeeze()
-            for i in temp:
-                yield i
-
-    #( --- sum --- )#
-    def __add__(self, y):
-        if isinstance(y, kArray):
-            if self.array.shape != y.array.shape:
-                raise(NameError("both arrays shall have the same dimensions"))
-            else:
-                ret = self.__class__( self.array + y.array )
-
-        elif isinstance(y, (int, float, np.ndarray)):
-            ret = self.__class__( y + self.array )
-
-        else:
-            raise(NameError("not prepared for type '{:s}'".format(str(type(y)))))
-
-        return ret
-
-    def __radd__(self, y): # y + self
-        return self.__add__(y)
-
-    def __iadd__(self, y): # self += y
-        if isinstance(y, kArray):
-            self.array += y.array
-        else:
-            self.array += y
-        return(self)
-
-    #( --- negative signal --- )#
-    def __neg__(self):
-        return self.__class__( -self.array )
-
-    #( --- difference --- )#
-    def __sub__(self, y):
-        if isinstance(y, kArray):
-            if self.array.shape != y.array.shape:
-                raise(NameError("both vector shall have the same dimensions"))
-            else:
-                ret = self.__class__( self.array - y.array )
-
-        elif isinstance(y, (int, float, np.ndarray)):
-            ret = self.__class__( self.array - y )
-
-        else:
-            raise(NameError("not prepared for type '{:s}'".format(str(type(y)))))
-
-        return ret
-
-    def __rsub__(self, y):
-        # y - self
-        return (-self).__add__(y)
-
-    def __isub__(self, y): # -=
-        self.array = self.array - y
-        return(self)
-
-    #( --- multiplication --- )#
+    # NumPy implements matrix multiplication other than we learn in the school.
+    # Here I will bring it back.
     def __mul__(self, y):
-        if isinstance(y, kArray):
-            axb   = self.array.dot(y.array)
-            vtype = self._type( np.asarray(axb) )
-            if vtype == self.TYPE_HORIZONTAL:
-                ret = self.__class__( axb, hvector=True )
-            elif vtype == self.TYPE_VERTICAL:
-                ret = self.__class__( axb, hvector=False )
-            else:
-                ret = self.__class__( axb )
+        if isinstance(y, (int, float)):
+            ret = super().__mul__(y)
+
+        elif isinstance(y, (self.__class__)) or True: # <-- before failing, try this anyway (eg. kArrayNav)
+            axb = self @ y
+            ret = axb.view(self.__class__)
 
             # last check: if `ret` is a matrix [1x1], then return a float:
-            if ret.array.shape == (1,1):
-                ret = ret.array.squeeze().tolist()
-
-        elif isinstance(y, (int, float)):
-            ret = self.__class__( self.array * y )
+            if ret.shape in [(1), (1,1)]:
+                ret = float(ret.squeeze())
 
         else:
-            raise(NameError("not prepared for type '{:s}'".format(str(type(y)))))
+            raise(NameError(f"not prepared for type '{str(type(y))}' [self.__class__ = {self.__class__}]"))
 
         return ret
 
     def __rmul__(self, y):
-        # y * self
-        return self.__mul__(y)
+        # if y were a matrix, then __mul__() would be called by the matrix.
+        return self * y
+    #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 
-    def __imul__(self, y): # *=
-        self = self * y
-        return(self)
-
-    #( --- division --- )#
-    def __truediv__(self, y):
-        if isinstance(y, float):
-            return self.__class__( self.array / y )
-        else:
-            raise(NameError("still not supported"))
-        return ret
-
-    def __rtruediv__(self, y):
-        raise(NameError("still not supported"))
-
-    def __itruediv__(self, y): # /=
-        self.array /= y
-        return(self)
-
-    #( --- miscelaneous --- )#
-    def __abs__(self):
-        vtype = self._type(self.array)
+    def norm(self):
+        vtype = self._type(self)
         if vtype in [ self.TYPE_HORIZONTAL, self.TYPE_VERTICAL ]:
-            return math.sqrt( sum( [i**2 for i in self.array.squeeze()] ))
+            return math.sqrt( sum( [i**2 for i in self.squeeze()] ))
         elif vtype == self.TYPE_SINGLEVALUE:
-            return abs(self.array.squeeze())
+            return abs(self.squeeze())
         else:
-            raise(NameError("not prepared for type '{:s}'".format(str(type(y)))))
+            raise(NameError(f"not prepared for type '{str(type(y))}' [self.__class__ = {self.__class__}]"))
+
+    #( --- iter --- )#
+    def __iter__(self):
+        temp = self.reshape(-1).tolist()
+        for i in temp:
+            yield i
 
     def inv(self):
-        return self.__class__( np.linalg.inv(self.array) )
-
-    def to_list(self):
-        return self.array.reshape(1,-1).squeeze().tolist()
-
-#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
-class kArrayTests:
-    def tests_general(self):
-        print("==== type() ====")
-
-        a = kArray([[1,2],[3,4]]) # only to get in with a valid object
-        assert a._type( np.asarray( [1] )) == a.TYPE_SINGLEVALUE
-        assert a._type( np.asarray( [1,2,3] )) == a.TYPE_HORIZONTAL
-        assert a._type( np.asarray( [[1,2,3]] )) == a.TYPE_HORIZONTAL
-        assert a._type( np.asarray( [[1]] )) == a.TYPE_SINGLEVALUE
-        assert a._type( np.asarray( [[1,2]] )) == a.TYPE_HORIZONTAL
-        assert a._type( np.asarray( [[1],[2]] )) == a.TYPE_VERTICAL
-        assert a._type( np.asarray( [[1,2],[3,4]] )) == a.TYPE_ARRAY
-
-        try:
-            ok = False
-            a._type( np.asarray( [] ))
-        except:
-            ok = True
-        if not ok:
-            raise(NameError("Error"))
-
-    def tests_vector(self):
-        print("==== __init__() ====")
-
-        print("kArray([1]) = ")
-        print(kArray([1]))
-        print("kArray([1,2,3]) = ")
-        print(kArray([1,2,3]))
-        print("kArray([1,2,3],hvector=True) = ")
-        print(kArray([1,2,3],hvector=True))
-        print("kArray([1,2,3],hvector=False) = ")
-        print(kArray([1,2,3],hvector=False))
-        print("kArray([[1,2,3]], hvector=False) = ")
-        print(kArray([[1,2,3]], hvector=False))
-        print("kArray([[1],[2]], hvector=True) = ")
-        print(kArray([[1],[2]], hvector=True))
-
-        print("==== transpose ====")
-        a = kArray([1,2,3], hvector=True)
-        print("a = {:f}".format(a))
-        print("a.T = {:f}".format(a.T))
-        print("a.T.T = {:f}".format(a.T.T))
-        print("a.T.T.T = {:f}".format(a.T.T.T))
-        print("a = {:f}".format(a))
-
-        print("==== iter ====")
-        a = kArray( [1,2,3], hvector=False )
-
-        # iter():
-        for i,j in zip(a,[1,2,3]):
-            assert i == j
-
-        print("==== eq ====")
-        a = kArray([1,2,3])
-        b = kArray([2,2,3])
-        assert a == a
-        assert a != b
-        print("a == a: {:s}".format((a==a).__str__()))
-        print("a == b: {:s}".format((a==b).__str__()))
-
-        print("==== sum ====")
-        a = kArray((1,2,3))
-        b = kArray((4,5,6))
-        assert a+b == kArray([5,7,9])
-        assert a+(-1) == kArray([0,1,2])
-        assert (-1)+a == kArray([0,1,2])
-        print("a + b    = {:f}".format(a+b))
-        print("a + (-1) = {:f}".format(a+(-1)))
-        print("(-1) + a = {:f}".format((-1)+a))
-        a += 7
-        assert a == kArray([8,9,10])
-        print("a += 7: {:f}".format(a))
-
-        print("==== negative signal ====")
-        print("-a = {:f}".format(-a))
-        assert -a == kArray([-8,-9,-10])
-
-        print("==== difference ====")
-        a = kArray((1,2,3))
-        b = kArray((4,5,6))
-        assert a-b == kArray([-3, -3, -3])
-        assert 3.-a == kArray([2,1,0])
-        print("a - b   = {:f}".format(a-b))
-        print("3.0 - a = {:f}".format(3.0-a))
-        a -= 3.0
-        assert a == kArray([-2,-1,0])
-        print("a -= 3.0: {:f}".format(a))
-
-        print("==== multiplication ====")
-        a = kArray([1,2,3])
-        b = kArray((4,5,6))
-        try:
-            print("a * b = {:f}".format(a*b))
-        except:
-            print("a * b =")
-            print("    ^^^ERROR")
-
-        assert a*b.T == 32
-        assert 7.*a == kArray([7,14,21])
-        print("a.T     = {:f}".format(a.T))
-        print("7.0 * a = {:f}".format( 7.0 * a ))
-        a *= 10
-        assert a == kArray([10,20,30])
-        print("a *= 10 : {:f}".format(a))
-
-        print("==== norm ====")
-        a = kArray([1,1])
-        assert abs(abs(a) - math.sqrt(2)) < 1e-10
-        print("||a|| = {:f}".format(abs(a)))
-        a = kArray(-32)
-        assert abs(abs(a) - 32.0) < 1e-10
-
-    #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
-    def tests_matrix(self):
-        print("==== __init__() ====")
-        print("kArray( [[1,2,3],[4,5,6]] ) =")
-        print(kArray( [[1,2,3],[4,5,6]] ))
-
-        print("==== transpose ====")
-        a = kArray( [[1,2],[3,4]] )
-        print("a = {:f}".format(a))
-        print("a.T = {:f}".format(a.T))
-        print("a.T.T = {:f}".format(a.T.T))
-        print("a.T.T.T = {:f}".format(a.T.T.T))
-
-        val = [1,3,2,4]
-        for i in a.T:
-            assert i == val.pop(0)
-
-        assert a.T.T == a
-        assert a.T.T.T == a.T
-
-        print("==== sum ====")
-        a = kArray( [[1,2,3], [4,5,6]] )
-        b = kArray( [[0,1,2], [3,4,5]] )
-        c = kArray( [[10,11],[12,13],[14,15]] )
-
-        assert a+b == kArray( [[1,3,5], [7,9,11]] )
-        assert c.T+a == kArray( [[11,14,17], [15,18,21]] )
-        assert b+c.T == kArray( [[10,13,16], [14,17,20]] )
-
-        assert a+(-1) == b
-        assert (-1)+a == b
-
-        a += 7
-        assert a == kArray( [[8,9,10], [11,12,13]] )
-        print("a += 7: {:f}".format(a))
-
-        print("==== negative signal ====")
-        a = kArray( [[1,2,3], [4,5,6]] )
-        assert -a == kArray( [[-1, -2, -3], [-4, -5, -6]] )
-        print("-a = {:f}".format(-a))
-
-        print("==== difference ====")
-        a = kArray( [[1,2,3], [4,5,6]] )
-        b = kArray( [[0,1,2], [3,4,5]] )
-        c = kArray( [[10,11],[12,13],[14,15]] )
-
-        assert a-b      == kArray( 1+np.zeros((2,3)) )
-        assert a.T-c    == kArray( [[-9,-7],[-10,-8],[-11,-9]] )
-        assert a-c.T    == kArray( [[-9,-10,-11],[-7,-8,-9]] )
-        assert a.T-b.T  == kArray( np.ones((3,2)) )
-
-        assert a-1 == kArray( [[0,1,2],[3,4,5]] )
-        assert 1-a == kArray( [[0,-1,-2],[-3,-4,-5]] )
-
-        a -= 3.0
-        assert a == kArray( [[-2,-1,0],[1,2,3]] )
-        print("a -= 3.0: {:f}".format(a))
-
-        print("==== multiplication ====")
-        a = kArray( [[1,2,3], [4,5,6]] ) # 2x3
-        b = kArray( [[0,1,2], [3,4,5]] ) # 2x3
-        c = kArray( [[10,11],[12,13],[14,15]] ) # 3x2
-        d = kArray( [1,2,3], hvector=False ) # 3x1
-        e = kArray( [2,3], hvector=True ) # 1x2
-
-        assert a*b.T == kArray( [[8,26],[17,62]] )
-        assert a.T*b == kArray( [[12,17,22],[15,22,29],[18,27,36]] )
-        assert a*c == kArray( [[76, 82],[184,199]] )
-        assert a*d == kArray( [[14],[32]] )
-        assert e*a*d == 124.
-
-        assert a*2.0 == kArray( [[2,4,6],[8,10,12]] )
-        assert 2.0*b == kArray( [[0,2,4],[6,8,10]] )
-        b *= -1.0
-        assert b == kArray( [[0,-1,-2],[-3,-4,-5]] )
-
-        try:
-            ok = False
-            print(a*a)
-        except:
-            ok = True
-
-        if not ok:
-            raise(NameError("it should not reach here"))
-
-        print("==== indexing ====")
-        a = kArray( [[1,2,3], [4,5,6]] ) # 2x3
-        assert a[1,1] == 5
-        assert list(a[1]) == [4,5,6]
-
-#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
-#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
-
-if __name__ == "__main__":
-    test_obj = kArrayTests()
-
-    test_obj.tests_general()
-    test_obj.tests_vector()
-    test_obj.tests_matrix()
+        return np.linalg.inv(self).view(self.__class__)
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
