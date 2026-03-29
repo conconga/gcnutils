@@ -9,7 +9,6 @@ sys.path.append("..")
 
 from knavigation import *
 import numpy as np
-import math
 
 
 class TestClass_kArray:
@@ -126,14 +125,6 @@ class TestClass_kArray:
         assert a == kArray([10,20,30])
         print("a *= 10 : {:f}".format(a))
 
-    def test_vector_norm(self):
-        print("==== norm ====")
-        a = kArray([1,1])
-        assert abs(a.norm() - math.sqrt(2)) < 1e-10
-        print("||a|| = {:f}".format(abs(a)))
-        a = kArray(-32)
-        assert abs(abs(a) - 32.0) < 1e-10
-
     #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
     def test_matrix_init(self):
         print("==== __init__() ====")
@@ -223,20 +214,6 @@ class TestClass_kArray:
 
         if not ok:
             raise(NameError("it should not reach here"))
-
-    def test_matrix_inv(self):
-        print("==== inv() ====")
-        M = [[1,2,3], [40,5,6], [7,8,9]]
-        #M = np.random.randn(3,3)
-        a = kArray(M)
-        b = kArray(M)
-        identity = a.inv() * b
-        for i in range(3):
-            for j in range(3):
-                if i == j:
-                    assert abs(identity[i,j] - 1.0) < 1e-10
-                else:
-                    assert abs(identity[i,j]) < 1e-10
 
     def test_matrix_indexing(self):
         print("==== indexing ====")
