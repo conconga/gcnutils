@@ -33,7 +33,7 @@ class TestClass_kArray:
         if not ok:
             raise(NameError("Error"))
 
-    def test_vector(self):
+    def test_vector_init(self):
         print("==== __init__() ====")
 
         print("kArray([1]) = ")
@@ -49,6 +49,7 @@ class TestClass_kArray:
         print("kArray([[1],[2]], hvector=True) = ")
         print(kArray([[1],[2]], hvector=True))
 
+    def test_vector_transpose(self):
         print("==== transpose ====")
         a = kArray([1,2,3], hvector=True)
         print("a = {:f}".format(a))
@@ -57,6 +58,7 @@ class TestClass_kArray:
         print("a.T.T.T = {:f}".format(a.T.T.T))
         print("a = {:f}".format(a))
 
+    def test_vector_iter(self):
         print("==== iter ====")
         a = kArray( [1,2,3], hvector=False )
 
@@ -64,14 +66,17 @@ class TestClass_kArray:
         for i,j in zip(a,[1,2,3]):
             assert i == j
 
+    def test_vector_eq(self):
         print("==== eq ====")
         a = kArray([1,2,3])
         b = kArray([2,2,3])
         assert a == a
         assert a != b
+        a = kArray([8,9,10])
         print("a == a: {:s}".format((a==a).__str__()))
         print("a == b: {:s}".format((a==b).__str__()))
 
+    def test_vector_sum(self):
         print("==== sum ====")
         a = kArray((1,2,3))
         b = kArray((4,5,6))
@@ -85,10 +90,13 @@ class TestClass_kArray:
         assert a == kArray([8,9,10])
         print("a += 7: {:f}".format(a))
 
+    def test_vector_negative_signal(self):
         print("==== negative signal ====")
+        a = kArray([8,9,10])
         print("-a = {:f}".format(-a))
         assert -a == kArray([-8,-9,-10])
 
+    def test_vector_difference(self):
         print("==== difference ====")
         a = kArray((1,2,3))
         b = kArray((4,5,6))
@@ -100,6 +108,7 @@ class TestClass_kArray:
         assert a == kArray([-2,-1,0])
         print("a -= 3.0: {:f}".format(a))
 
+    def test_vector_multiplication(self):
         print("==== multiplication ====")
         a = kArray([1,2,3])
         b = kArray((4,5,6))
@@ -117,6 +126,7 @@ class TestClass_kArray:
         assert a == kArray([10,20,30])
         print("a *= 10 : {:f}".format(a))
 
+    def test_vector_norm(self):
         print("==== norm ====")
         a = kArray([1,1])
         assert abs(a.norm() - math.sqrt(2)) < 1e-10
@@ -125,11 +135,12 @@ class TestClass_kArray:
         assert abs(abs(a) - 32.0) < 1e-10
 
     #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
-    def test_matrix(self):
+    def test_matrix_init(self):
         print("==== __init__() ====")
         print("kArray( [[1,2,3],[4,5,6]] ) =")
         print(kArray( [[1,2,3],[4,5,6]] ))
 
+    def test_matrix_transpose(self):
         print("==== transpose ====")
         a = kArray( [[1,2],[3,4]] )
         print("a = {:f}".format(a))
@@ -144,6 +155,7 @@ class TestClass_kArray:
         assert a.T.T == a
         assert a.T.T.T == a.T
 
+    def test_matrix_sum(self):
         print("==== sum ====")
         a = kArray( [[1,2,3], [4,5,6]] )
         b = kArray( [[0,1,2], [3,4,5]] )
@@ -160,11 +172,13 @@ class TestClass_kArray:
         assert a == kArray( [[8,9,10], [11,12,13]] )
         print("a += 7: {:f}".format(a))
 
+    def test_matrix_negative_signal(self):
         print("==== negative signal ====")
         a = kArray( [[1,2,3], [4,5,6]] )
         assert -a == kArray( [[-1, -2, -3], [-4, -5, -6]] )
         print("-a = {:f}".format(-a))
 
+    def test_matrix_difference(self):
         print("==== difference ====")
         a = kArray( [[1,2,3], [4,5,6]] )
         b = kArray( [[0,1,2], [3,4,5]] )
@@ -182,6 +196,7 @@ class TestClass_kArray:
         assert a == kArray( [[-2,-1,0],[1,2,3]] )
         print("a -= 3.0: {:f}".format(a))
 
+    def test_matrix_multiplication(self):
         print("==== multiplication ====")
         a = kArray( [[1,2,3], [4,5,6]] ) # 2x3
         b = kArray( [[0,1,2], [3,4,5]] ) # 2x3
@@ -209,6 +224,8 @@ class TestClass_kArray:
         if not ok:
             raise(NameError("it should not reach here"))
 
+
+    def test_matrix_indexing(self):
         print("==== indexing ====")
         a = kArray( [[1,2,3], [4,5,6]] ) # 2x3
         assert a[1,1] == 5
