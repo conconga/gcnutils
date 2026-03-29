@@ -120,8 +120,8 @@ class TestClass_kArrayNav:
         # some dynamic tests:
         #----------------------#
         print("==== dqdt ====")
-        from   scipy.integrate import odeint;
         from   numpy           import dot;
+        import scipy.integrate  as Int
         print()
 
         #  I: inertial frame
@@ -151,7 +151,7 @@ class TestClass_kArrayNav:
             # after t seconds, the quaternions should be:
             #print("qI2b.to_list() =")
             #print(qI2b.to_list())
-            y = odeint(eqdiff, qI2b.to_list(), [0,t], (w_ib_i,))[1,:]
+            y = Int.odeint(eqdiff, qI2b.to_list(), [0,t], (w_ib_i,))[1,:]
             # with these euler angles:
             euler = ((180./pi) * kArrayNav(y).Q2euler()).to_list()
             print('euler = {:s}'.format(str(euler)))
@@ -317,7 +317,6 @@ class TestClass_kArrayNav:
             return Rp.to_list()
 
         def tests_angular_speed(t):
-            import scipy.integrate  as Int
 
             if t < 1:
                 w   = kArrayNav( [10,10,10] ).to_rad().to_list()
