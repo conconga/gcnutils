@@ -1,38 +1,38 @@
--   [<span class="toc-section-number">1</span>
-    Introduction](#introduction)
--   [<span class="toc-section-number">2</span> Classes](#classes)
-    -   [<span class="toc-section-number">2.1</span>
-        k2OrderLTIsysSiso](#k2orderltisyssiso)
-        -   [<span class="toc-section-number">2.1.1</span> to create a
-            SISO continuous 2-order LTI
-            system:](#to-create-a-siso-continuous-2-order-lti-system)
-        -   [<span class="toc-section-number">2.1.2</span> to create a
-            SISO discrete 2-order LTI
-            system:](#to-create-a-siso-discrete-2-order-lti-system)
-        -   [<span class="toc-section-number">2.1.3</span> to update the
-            systems:](#to-update-the-systems)
-        -   [<span class="toc-section-number">2.1.4</span> to get the
-            current state:](#to-get-the-current-state)
-    -   [<span class="toc-section-number">2.2</span>
-        k2OrderLTIsysMimo](#k2orderltisysmimo)
-        -   [<span class="toc-section-number">2.2.1</span> to create a
-            MIMO continuous 2-order LTI
-            system:](#to-create-a-mimo-continuous-2-order-lti-system)
-        -   [<span class="toc-section-number">2.2.2</span> to create a
-            MIMO discrete 2-order LTI
-            system:](#to-create-a-mimo-discrete-2-order-lti-system)
-        -   [<span class="toc-section-number">2.2.3</span> to update the
-            systems:](#to-update-the-systems-1)
-        -   [<span class="toc-section-number">2.2.4</span> to get the
-            current state:](#to-get-the-current-state-1)
-    -   [<span class="toc-section-number">2.3</span>
-        kNOrderDerivativeSiso](#knorderderivativesiso)
-        -   [<span class="toc-section-number">2.3.1</span> to create a
-            system (filter):](#to-create-a-system-filter)
-        -   [<span class="toc-section-number">2.3.2</span> to update the
-            inputs and get new
-            outputs:](#to-update-the-inputs-and-get-new-outputs)
--   [<span class="toc-section-number">3</span> How to use](#how-to-use)
+- [<span class="toc-section-number">1</span>
+  Introduction](#introduction)
+- [<span class="toc-section-number">2</span> Classes](#classes)
+  - [<span class="toc-section-number">2.1</span>
+    k2OrderLTIsysSiso](#k2orderltisyssiso)
+    - [<span class="toc-section-number">2.1.1</span> to create a SISO
+      continuous 2-order LTI
+      system:](#to-create-a-siso-continuous-2-order-lti-system)
+    - [<span class="toc-section-number">2.1.2</span> to create a SISO
+      discrete 2-order LTI
+      system:](#to-create-a-siso-discrete-2-order-lti-system)
+    - [<span class="toc-section-number">2.1.3</span> to update the
+      systems:](#to-update-the-systems)
+    - [<span class="toc-section-number">2.1.4</span> to get the current
+      state:](#to-get-the-current-state)
+  - [<span class="toc-section-number">2.2</span>
+    k2OrderLTIsysMimo](#k2orderltisysmimo)
+    - [<span class="toc-section-number">2.2.1</span> to create a MIMO
+      continuous 2-order LTI
+      system:](#to-create-a-mimo-continuous-2-order-lti-system)
+    - [<span class="toc-section-number">2.2.2</span> to create a MIMO
+      discrete 2-order LTI
+      system:](#to-create-a-mimo-discrete-2-order-lti-system)
+    - [<span class="toc-section-number">2.2.3</span> to update the
+      systems:](#to-update-the-systems-1)
+    - [<span class="toc-section-number">2.2.4</span> to get the current
+      state:](#to-get-the-current-state-1)
+  - [<span class="toc-section-number">2.3</span>
+    kNOrderDerivativeSiso](#knorderderivativesiso)
+    - [<span class="toc-section-number">2.3.1</span> to create a system
+      (filter):](#to-create-a-system-filter)
+    - [<span class="toc-section-number">2.3.2</span> to update the
+      inputs and get new
+      outputs:](#to-update-the-inputs-and-get-new-outputs)
+- [<span class="toc-section-number">3</span> How to use](#how-to-use)
 
 # Introduction
 

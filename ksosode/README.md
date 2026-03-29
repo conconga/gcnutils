@@ -1,14 +1,13 @@
--   [<span class="toc-section-number">1</span> System of Systems of
-    ODE’s](#system-of-systems-of-odes)
--   [<span class="toc-section-number">2</span> Each piece of the
-    System](#each-piece-of-the-system)
--   [<span class="toc-section-number">3</span> Examples](#examples)
-    -   [<span class="toc-section-number">3.1</span> Example
-        1](#example-1)
-    -   [<span class="toc-section-number">3.2</span> Example 2 (with
-        integration)](#example-2-with-integration)
-    -   [<span class="toc-section-number">3.3</span> Example 3 (using
-        integration object)](#example-3-using-integration-object)
+- [<span class="toc-section-number">1</span> System of Systems of
+  ODE’s](#system-of-systems-of-odes)
+- [<span class="toc-section-number">2</span> Each piece of the
+  System](#each-piece-of-the-system)
+- [<span class="toc-section-number">3</span> Examples](#examples)
+  - [<span class="toc-section-number">3.1</span> Example 1](#example-1)
+  - [<span class="toc-section-number">3.2</span> Example 2 (with
+    integration)](#example-2-with-integration)
+  - [<span class="toc-section-number">3.3</span> Example 3 (using
+    integration object)](#example-3-using-integration-object)
 
 # System of Systems of ODE's
 
