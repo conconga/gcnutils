@@ -60,6 +60,18 @@ class kArrayLib:
 
         return self.__class__( fn(self) )
 
+    def norm(self):
+        vtype = self._type(self)
+        if vtype in [ self.TYPE_HORIZONTAL, self.TYPE_VERTICAL ]:
+            return sqrt( sum( [i**2 for i in self.squeeze()] ))
+        elif vtype == self.TYPE_SINGLEVALUE:
+            return abs(self.squeeze())
+        else:
+            raise(NameError(f"not prepared for type '{str(type(y))}' [self.__class__ = {self.__class__}]"))
+
+    def inv(self):
+        return np.linalg.inv(self).view(self.__class__)
+
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 class kNavTransformations(kNavLib):
 

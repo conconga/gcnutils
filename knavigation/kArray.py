@@ -12,7 +12,6 @@ GitHub:
 """
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 import numpy as np
-import math
 #import copy
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 
@@ -202,22 +201,10 @@ class kArray (kArrayCommon, np.ndarray):
         return self * y
     #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 
-    def norm(self):
-        vtype = self._type(self)
-        if vtype in [ self.TYPE_HORIZONTAL, self.TYPE_VERTICAL ]:
-            return math.sqrt( sum( [i**2 for i in self.squeeze()] ))
-        elif vtype == self.TYPE_SINGLEVALUE:
-            return abs(self.squeeze())
-        else:
-            raise(NameError(f"not prepared for type '{str(type(y))}' [self.__class__ = {self.__class__}]"))
-
     #( --- iter --- )#
     def __iter__(self):
         temp = self.reshape(-1).tolist()
         for i in temp:
             yield i
-
-    def inv(self):
-        return np.linalg.inv(self).view(self.__class__)
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
