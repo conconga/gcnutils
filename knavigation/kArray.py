@@ -79,7 +79,7 @@ class kArrayCommon:
     def __eq__(self, y):
         tol = 1e-10
         ret = True
-        y   = kArray(y)
+        y   = self.__class__(y)
 
         if self.shape != y.shape:
             ret = False
