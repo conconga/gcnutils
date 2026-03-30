@@ -8,30 +8,55 @@ print(f"** sys.path[0] = {sys.path[0]}")
 sys.path.append("..")
 
 from knavigation import *
+from unittest.mock import patch
 import numpy as np
+import pytest
 
 
 class TestClass_kArray:
-    def test_general(self):
+
+    #----------------------------------------#
+    @pytest.mark.singleshot
+    def test_type_single_call(self):
         print("==== type() ====")
 
-        a = kArray([[1,2],[3,4]]) # only to get in with a valid object
-        assert a._type( np.asarray( [1] )) == a.TYPE_SINGLEVALUE
-        assert a._type( np.asarray( [1,2,3] )) == a.TYPE_HORIZONTAL
-        assert a._type( np.asarray( [[1,2,3]] )) == a.TYPE_HORIZONTAL
-        assert a._type( np.asarray( [[1]] )) == a.TYPE_SINGLEVALUE
-        assert a._type( np.asarray( [[1,2]] )) == a.TYPE_HORIZONTAL
-        assert a._type( np.asarray( [[1],[2]] )) == a.TYPE_VERTICAL
-        assert a._type( np.asarray( [[1,2],[3,4]] )) == a.TYPE_ARRAY
+        # replacing the method "_type" by a mock:
+        with patch.object(kArray, "_type") as mock_type:
+            # configuring the return of the _type() method:
+            mock_type.return_value = kArray.TYPE_ARRAY
 
-        try:
-            ok = False
-            a._type( np.asarray( [] ))
-        except:
-            ok = True
-        if not ok:
-            raise(NameError("Error"))
+            # construct the object with a matrix:
+            a = kArray([[1,2],[3,4]])
 
+            # asserts:
+            assert mock_type.call_count == 1
+
+    #----------------------------------------#
+    @pytest.mark.parametrize(
+            "content, vtype", [
+                ( [1],           kArray.TYPE_SINGLEVALUE ),
+                ( [1,2,3],       kArray.TYPE_HORIZONTAL ),
+                ( [[1,2,3]],     kArray.TYPE_HORIZONTAL ),
+                ( [[1]],         kArray.TYPE_SINGLEVALUE ),
+                ( [[1,2]],       kArray.TYPE_HORIZONTAL ),
+                ( [[1],[2]],     kArray.TYPE_VERTICAL ),
+                ( [[1,2],[3,4]], kArray.TYPE_ARRAY ),
+    ])
+    def test_type_correct_classification(self, content, vtype):
+        assert kArray._type( np.asarray( content ) ) == vtype
+
+    #----------------------------------------#
+    @pytest.mark.parametrize(
+            "input_matrix, aux", [
+                ( list(), 'just testing with a second argument' ),
+                ( "string", "another test", ),
+    ])
+    def test_type_incorrect_classification(self, input_matrix, aux):
+        print("input_matrix =", input_matrix)
+        with pytest.raises(Exception): # <== ValueError?
+            kArray._type( np.asarray( input_matrix ))
+
+    #----------------------------------------#
     def test_vector_init(self):
         print("==== __init__() ====")
 
