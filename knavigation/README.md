@@ -179,5 +179,6 @@ b = a.apply(lambda x: np.linalg.inv(x))
 Note: the class `kArrayNav` includes a `.inv()` method anyhow.. 
 
 # How to test it
-
-In the folder `tests/` call `pytest`
+```
+$ pytest
+```
