@@ -11,8 +11,14 @@ Lizenz:
 GitHub: 
 """
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
+import sys
+print( "**************************************" )
+print(f"** __name__    = {__name__}")
+print(f"** __package__ = {__package__}")
+print(f"** sys.path[0] = {sys.path[0]}")
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 import numpy as np
-#import copy
+from .kArrayLib import kArrayLib
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
@@ -95,7 +101,7 @@ class kArrayCommon:
         return self.reshape(-1).tolist()
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
-class kArray (kArrayCommon, np.ndarray):
+class kArray (kArrayCommon, kArrayLib, np.ndarray):
 
     def __new__(cls, *args, hvector=None):
         """
