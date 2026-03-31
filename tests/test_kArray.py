@@ -1,16 +1,19 @@
-import sys    
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
+import sys
+print( "**************************************" )
 print(f"** __name__    = {__name__}")
 print(f"** __package__ = {__package__}")
 print(f"** sys.path[0] = {sys.path[0]}")
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 
-# when this is called from within the folder 'tests/', we
-# need to add the path to the package __init__.py:
-sys.path.append("..")
-
-from knavigation import *
+from knavigation import kArray
 from unittest.mock import patch
 import numpy as np
 import pytest
+
+if False:
+    import pudb
+    pudb.set_trace()
 
 
 class TestClass_kArray:
@@ -94,8 +97,10 @@ class TestClass_kArray:
         print("==== eq ====")
         a = kArray([1,2,3])
         b = kArray([2,2,3])
+        c = kArray([1,2])
         assert a == a
         assert a != b
+        assert a != c
         a = kArray([8,9,10])
         print("a == a: {:s}".format((a==a).__str__()))
         print("a == b: {:s}".format((a==b).__str__()))
