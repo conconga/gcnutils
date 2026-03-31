@@ -297,8 +297,8 @@ class kNavTransformations(kNavLib):
 
     def dqdt(self, w):
         """
-        The derivative of the quaternions is $\dot{q} = 1/2 .B(w).q$
-        This funtion returns $\dot{q}$.
+        The derivative of the quaternions is $\\dot{q} = 1/2 .B(w).q$
+        This funtion returns $\\dot{q}$.
         : input  : q4
         : output : d(q4)dt
         """
