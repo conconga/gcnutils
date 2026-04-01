@@ -7,9 +7,9 @@ print(f"** sys.path[0] = {sys.path[0]}")
 
 from knavigation import kArrayNav, kArray
 import numpy as np
-from numpy import pi
-from math import sqrt
 import math
+from numpy import pi, dot
+from math  import sqrt
 
 
 class TestClass_kArrayNav:
@@ -86,13 +86,15 @@ class TestClass_kArrayNav:
                 #print("{:f} == {:f} ?".format(i,j))
                 assert abs(i-j) < 1e-3
 
+    def test_dynamics(self):
         #----------------------#
         # some dynamic tests:
         #----------------------#
         print("==== dqdt ====")
-        from   numpy           import dot;
+
+        # sometimes the developers change the interface with the integrators
+        # we shall test it as well:
         import scipy.integrate  as Int
-        print()
 
         #  I: inertial frame
         #  b: body frame
@@ -116,7 +118,7 @@ class TestClass_kArrayNav:
         print("F_i = ")
         print(F_i)
 
-        for t in [1,5,20,90]:
+        for t in [1,5,20,89]:
             print()
             # after t seconds, the quaternions should be:
             #print("qI2b.to_list() =")
@@ -128,31 +130,28 @@ class TestClass_kArrayNav:
 
             # and described at b:
             F_b = (kArrayNav(y).Q2C() * F_i).to_list()
+            euler_expected = kArrayNav((t * w_ib_i)).to_deg() 
 
-            print("F_b(phi = {:1.03f}) = [{:1.03f} {:1.03f} {:1.03f}]".format(
-                euler[0], F_b[0], F_b[1], F_b[2]))
+            print(f'F_b(phi = {euler[0]:1.03f}) = [ {F_b[0]:1.03f} {F_b[1]:1.03f} {F_b[2]:1.03f} ]')
+            print(f'euler_expected = {euler_expected:2.2f}')
 
-        # gravity:
+            assert (euler_expected - euler).norm() < 1e-3
+
+    def test_gravity(self):
         print("==== gravity ====")
-        import matplotlib.pylab as plt
 
-        plt.figure(1).clf()
-        fig, ax = plt.subplots(1,1,num=1)
         tmp = kArrayNav([0])
-        leg = list()
         for lat in kArrayNav( [0, 45, 80] ).to_rad():
-            leg.append("{:1.1f}".format(lat*180/pi))
-            g = list()
             for h in np.linspace(0, 3000, 20):
-                g.append( tmp.gravity(lat, h) )
-            ax.plot(np.linspace(0,3000,20), g)
+                tmp = kArrayNav.gravity_n(lat,h)
+                assert 9.6 < tmp[2] < 10.0
 
-        ax.legend(leg)
-
-        #----------------------#
-        # coherence tests
-        # (sense among frames)
-        #----------------------#
+    #----------------------#
+    # coherence tests
+    # (sense among frames)
+    #----------------------#
+    def test_coherence_rotation_body_frame(self):
+        # Tests #1
         list_euler = [
                 kArrayNav( [0,0,45] ).to_rad(),
                 kArrayNav( [0,45,0] ).to_rad(),
@@ -167,7 +166,6 @@ class TestClass_kArrayNav:
                 kArrayNav( [1,0,0], hvector=False ),
         ]
 
-        # Tests #1
         for euler,vn in zip(list_euler, list_results_at_n):
             # from a fixed reference frame 'n' to 'b'
             Cn2b = euler.euler2C()
@@ -177,6 +175,7 @@ class TestClass_kArrayNav:
             rn = Cn2b.T * rb
             assert rn == vn
 
+    def test_coherence_rotation_changes_psi(self):
         # Tests #2
         # An angular velocity [0,0,1] shall increase \psi
         # The angle \psi refers to how 'n' sees 'b'.
@@ -189,6 +188,7 @@ class TestClass_kArrayNav:
         euler  = Cb2n_step.T.C2euler()     # transposing to obtain the euler again
         assert euler[0][2] > 0
         
+    def test_coherence_rotation_changes_all_euler(self):
         # Tests #3
         # An angular velocity [1,1,1] shall increase all euler angles.
         # The euler angles refer to how 'n' sees 'b'.
@@ -202,6 +202,7 @@ class TestClass_kArrayNav:
         for i in euler[0]:
             assert i > 0
 
+    def test_coherence_rotation_changes_all_euler_with_quaternions(self):
         # Tests #4
         # Similar to above, but with quaternions in parallel.
         # Note: w_nb is described at b.
@@ -233,6 +234,7 @@ class TestClass_kArrayNav:
             assert euler_k1_q_n2b[0][i] > euler_n2b[0][i]
             assert abs( euler_k1_R_b2n[0][i] - euler_k1_q_n2b[0][i] ) < 1e-4
 
+    def test_coherence_inv_quaternion(self):
         # Tests #5
         # Here we want to check whether inverting a quaternion has the same effect as
         # inverting a transformation matrix.
@@ -260,10 +262,13 @@ class TestClass_kArrayNav:
                 print(euler_from_R_inv)
                 print()
 
+    def test_coherence_integrating_euler(self):
         # Tests #6
         # To compare the effect of w_nb_b on the euler angles using two methods:
         #  1) dEulerDt()
         #  2) Rb2n_p = Rb2n * w_nb_b
+        import scipy.integrate  as Int
+
         phi   = 20*np.random.randn()
         theta = 20*np.random.randn()
         psi   = 20*np.random.randn()
@@ -298,19 +303,19 @@ class TestClass_kArrayNav:
         Ret = [(kArrayNav( np.asarray(i).reshape(3,3) ).T.C2euler().to_deg() + 0.1).to_list() for i in Ret]
         # this 0.1 above is just to separate the curves on the next graph
 
-        plt.figure(2).clf()
-        fig,ax = plt.subplots(1,1,num=2)
-        ax.plot(T, ret)
-        ax.plot(T, Ret)
-        ax.grid(True)
+        if False:
+            plt.figure(2).clf()
+            fig,ax = plt.subplots(1,1,num=2)
+            ax.plot(T, ret)
+            ax.plot(T, Ret)
+            ax.grid(True)
 
         for i,j in zip(ret, Ret):
             for m,n in zip(i,j):
                 assert abs(m-n) < 0.11
 
         ###########################
-        plt.show(block=False)
+        #plt.show(block=False)
         ###########################
-        print("ok")
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
