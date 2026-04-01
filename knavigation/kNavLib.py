@@ -43,7 +43,8 @@ class kNavLib:
         """
         return self.earth_a / sqrt(1.-(self.earth_e2*(sin(lat_rad)**2.0)));
 
-    def gravity(self, lat_rad, h_m):
+    @classmethod
+    def gravity(cls, lat_rad, h_m):
         """
         Using the geografic reference frame, this model allows:
             gravity_n = [0,0,output]

@@ -284,7 +284,8 @@ class kNavTransformations(kNavLib):
 
         return self.__class__( [lat, lon, h] )
 
-    def gravity_n(self, lat_rad, h_m):
+    @classmethod
+    def gravity_n(cls, lat_rad, h_m):
         """
         Calculates the local gravity vector in the geografic frame (n).
 
@@ -293,7 +294,7 @@ class kNavTransformations(kNavLib):
         : return    : vector with local gravity [3x1]
         """
 
-        return self.__class__( [0,0,self.gravity(lat_rad, h_m)], hvector=False )
+        return cls( [0,0,cls.gravity(lat_rad, h_m)], hvector=False )
 
     def dqdt(self, w):
         """
