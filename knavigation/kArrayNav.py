@@ -150,7 +150,8 @@ class kNavTransformations(kNavLib):
             stheta = sin(theta)
             spsi   = sin(psi)
 
-            C = self.__class__( np.empty((3,3)) )
+            #C = self.__class__( np.empty((3,3)) )
+            C = self.__class__.empty((3,3))
             C[0][0] = cpsi*ctheta
             C[0][1] = spsi*ctheta
             C[0][2] = -stheta
