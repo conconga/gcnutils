@@ -158,7 +158,7 @@ class kNavTransformations(kNavLib):
             C[1][0] = (-spsi*cphi) + (cpsi*stheta*sphi)
             C[1][1] = (cpsi*cphi) + (spsi*stheta*sphi)
             C[1][2] = ctheta * sphi
-            C[2][0] = (sphi*sphi) + (cpsi*stheta*cphi)
+            C[2][0] = (spsi*sphi) + (cpsi*stheta*cphi)
             C[2][1] = (-cpsi*sphi) + (sphi*stheta*cphi)
             C[2][2] = ctheta * cphi
 
