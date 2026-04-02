@@ -152,6 +152,8 @@ class TestClass_kArrayNav:
     #----------------------#
     def test_coherence_rotation_body_frame(self):
         # Tests #1
+
+        # this is how the body-frame rotates from the n-frame:
         list_euler = [
                 kArrayNav( [0,0,45] ).to_rad(),
                 kArrayNav( [0,45,0] ).to_rad(),
