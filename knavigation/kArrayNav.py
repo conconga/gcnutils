@@ -270,6 +270,8 @@ class kNavTransformations(kNavLib):
         : output : d(q4)dt
         """
 
+        assert len(self.squeeze()) == 4
+
         K      = 1e1
         cq     = kArray( [i for i in self], hvector=False )
         cq2    = kArray( [i*i for i in self], hvector=False )
