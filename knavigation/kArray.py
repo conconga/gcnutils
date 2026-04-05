@@ -205,12 +205,14 @@ class kArray (kArrayCommon, kArrayLib, np.ndarray):
     def __rmul__(self, y):
         # if y were a matrix, then __mul__() would be called by the matrix.
         return self * y
-    #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 
     #( --- iter --- )#
     def __iter__(self):
         temp = self.reshape(-1).tolist()
         for i in temp:
             yield i
+
+    def to_numpy(self):
+        return np.asarray(self).copy()
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
