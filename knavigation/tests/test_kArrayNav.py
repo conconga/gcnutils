@@ -355,4 +355,22 @@ class TestClass_kArrayNav:
                 else:
                     assert abs(aux[i][j]) < 1e-10
 
+    def test_dLLH_to_south(self):
+        dLLH = kArrayNav.dLLH_dt(-10,0,0,0,0).squeeze()
+        assert dLLH[0] < -1e-6
+        assert dLLH[1] < 1e-10
+        assert dLLH[2] < 1e-10
+
+    def test_dLLH_to_east(self):
+        dLLH = kArrayNav.dLLH_dt(0,10,0,0,0).squeeze()
+        assert dLLH[0] < 1e-10
+        assert dLLH[1] > 1e-6
+        assert dLLH[2] < 1e-10
+
+    def test_dLLH_downward(self):
+        dLLH = kArrayNav.dLLH_dt(0,0,10,0,0).squeeze()
+        assert dLLH[0] < 1e-10
+        assert dLLH[1] < 1e-10
+        assert dLLH[2] < -9.9
+
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>

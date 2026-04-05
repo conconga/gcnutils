@@ -140,8 +140,8 @@ class kNavLib:
         """
 
         return cls( [
-            self.dLat_dt(vN, lat_rad, h_m),
-            self.dLong_dt(vE, lat_rad, h_m),
+            cls.dLat_dt(vN, lat_rad, h_m),
+            cls.dLong_dt(vE, lat_rad, h_m),
             -vD ], hvector=False )
 
     @classmethod
