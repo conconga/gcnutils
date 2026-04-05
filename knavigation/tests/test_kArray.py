@@ -251,5 +251,13 @@ class TestClass_kArray:
         assert a[1,1] == 5
         assert list(a[1]) == [4,5,6]
 
+    def test_from_kArray_to_NumPy(self):
+        a = kArray( [1,2,3], hvector=False )
+        b = a.to_numpy()
+        
+        assert type(b) == np.ndarray
+        assert b.shape == (3,1)
+
+
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
