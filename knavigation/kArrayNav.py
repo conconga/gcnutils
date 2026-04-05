@@ -377,7 +377,7 @@ class kNavTransformations(kNavLib):
         return self.__class__( [
             wie * cos(lat_rad),
             0.0,
-            wie * sin(lat_rad)
+            -wie * sin(lat_rad)
         ], hvector=False )
 
     def w_en_n(self, dLat_dt, dLong_dt, lat_rad):
