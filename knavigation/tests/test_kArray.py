@@ -258,6 +258,15 @@ class TestClass_kArray:
         assert type(b) == np.ndarray
         assert b.shape == (3,1)
 
+    def test_to_list(self):
+        a = kArray( (np.random.randn(5,5)*10).astype(int) )
+
+        a_lst = a.to_list()
+        assert isinstance(a_lst, list)
+        assert len(a_lst) == 25
+
+        b = kArray(a).reshape(5,5).copy()
+        assert a == b
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
