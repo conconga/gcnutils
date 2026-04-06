@@ -8,6 +8,7 @@ print(f"** sys.path[0] = {sys.path[0]}")
 from knavigation import kArrayNav, kArray
 import numpy as np
 import math
+import pytest
 from numpy import pi, dot
 from math  import sqrt
 
@@ -372,5 +373,112 @@ class TestClass_kArrayNav:
         assert dLLH[0] < 1e-10
         assert dLLH[1] < 1e-10
         assert dLLH[2] < -9.9
+
+    @pytest.fixture
+    def fixture_JacobianSetup(self):
+        lat = 50 * pi/180 # [rad] latitude
+        h   = 100 # [m] altitude
+        v   = 10 # [m/s] speed
+        dV  = 30 # [m/s] delta speed
+        return (lat, h, v, dV)
+
+
+    def test_Jacobian_dwin_vNED_for_vN(self, fixture_JacobianSetup):
+        lat, h, vN, dVn = fixture_JacobianSetup
+
+        # win(vN):
+        dLat = kArrayNav.dLat_dt(vN, lat, h)
+        wie = kArrayNav.w_ie_n(lat)
+        wen = kArrayNav.w_en_n(dLat, 0, lat)
+        win_1 = wie + wen
+
+        # win(vN+dVn):
+        dLat = kArrayNav.dLat_dt(vN + dVn, lat, h)
+        wie = kArrayNav.w_ie_n(lat)
+        wen = kArrayNav.w_en_n(dLat, 0, lat)
+        win_2 = wie + wen
+
+        # delta:
+        delta = win_2 - win_1
+        print("\ndelta =\n", delta)
+
+        # J x dVn:
+        JxdVn = kArrayNav.Jacobian_dwin_vNED(lat, h) * kArrayNav([dVn,0,0],hvector=False)
+        print("\nJ x dVn =\n", JxdVn)
+
+        assert abs(delta - JxdVn) == kArrayNav( np.zeros((3,1)) )
+
+    def test_Jacobian_dwin_vNED_for_vE(self, fixture_JacobianSetup):
+        lat, h, vE, dVe = fixture_JacobianSetup
+        vE *= -1
+
+        # win(vE):
+        dLon = kArrayNav.dLong_dt(vE, lat, h)
+        wie = kArrayNav.w_ie_n(lat)
+        wen = kArrayNav.w_en_n(0, dLon, lat)
+        win_1 = wie + wen
+
+        # win(vE+dVe):
+        dLon = kArrayNav.dLong_dt(vE + dVe, lat, h)
+        wie = kArrayNav.w_ie_n(lat)
+        wen = kArrayNav.w_en_n(0, dLon, lat)
+        win_2 = wie + wen
+
+        # delta:
+        delta = win_2 - win_1
+        print("\ndelta =\n", delta)
+
+        # J x dVn:
+        JxdVe = kArrayNav.Jacobian_dwin_vNED(lat, h) * kArrayNav([0,dVe,0],hvector=False)
+        print("\nJ x dVe =\n", JxdVe)
+
+        assert abs(delta - JxdVe) == kArrayNav( np.zeros((3,1)) )
+
+    def test_Jacobian_dwin_vNED_for_vD(self, fixture_JacobianSetup):
+        lat, h, vD, dVd = fixture_JacobianSetup
+
+        # J x dVn:
+        JxdVd = kArrayNav.Jacobian_dwin_vNED(lat, h) * kArrayNav([0,0,dVd],hvector=False)
+        print("\nJ x dVd =\n", JxdVd)
+
+        assert abs(JxdVd) == kArrayNav( np.zeros((3,1)) )
+
+    def test_Jacobian_dWin_LH_for_lat(self):
+        lat  = 50 * pi/180 # [rad] latitude
+        dlat =  1 * pi/180 # [rad] delta latitude
+        h    = 100 # [m] altitude
+
+        # win(lat):
+        wie = kArrayNav.w_ie_n(lat)
+        wen = kArrayNav.w_en_n(0,0,lat)
+        win_1 = wie + wen
+
+        # win(lat + dlat):
+        wie = kArrayNav.w_ie_n(lat + dlat)
+        wen = kArrayNav.w_en_n(0,0,lat+dlat)
+        win_2 = wie + wen
+
+        # delta:
+        delta = win_2 - win_1
+        print("\ndelta =\n", delta)
+
+        # J x dVn:
+        JxdLH = kArrayNav.Jacobian_dwin_LH(0,0,lat,h) * kArrayNav( [dlat, 0], hvector=False )
+        print("\nJ x dLH =\n", JxdLH)
+
+        assert abs(delta[0][0] - JxdLH[0][0]) < 1e-8
+        assert abs(delta[1][0] - JxdLH[1][0]) < 1e-14
+        assert abs(delta[2][0] - JxdLH[2][0]) < 1e-8
+
+    def test_Jacobian_dWin_LH_for_h(self):
+        lat  = 50 * pi/180 # [rad] latitude
+        h    = 100 # [m] altitude
+        dh   =   1 # [m] delta altitude
+
+        # J x dVn:
+        JxdLH = kArrayNav.Jacobian_dwin_LH(0,0,lat,h) * kArrayNav( [0, dh], hvector=False )
+
+        assert abs(JxdLH) == kArrayNav(np.zeros((3,1)))
+
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>

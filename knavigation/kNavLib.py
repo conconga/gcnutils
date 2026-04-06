@@ -11,7 +11,7 @@ Lizenz:
 GitHub: 
 """
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
-from math import sqrt, sin, cos
+from math import sqrt, sin, cos, tan
 import numpy as np
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 
@@ -200,6 +200,81 @@ class kNavLib:
         wp_en_z =  (-(cls.earth_a + sqrt(-e2s2l2 + 1.0)*h_m)*(-e2s2l2 + 1.0)*vE*slat**2*dLat - (cls.earth_a + sqrt(-e2s2l2 + 1.0)*h_m)*(-e2s2l2 + 1.0)*vE*clat**2*dLat - (cls.earth_a + sqrt(-e2s2l2 + 1.0)*h_m)*(-e2s2l2 + 1.0)*slat*clat*vEp + (1.0*cls.earth_a*cls.earth_e2*slat*clat*dLat + (-e2s2l2 + 1.0)**(3/2)*-vD)*vE*slat*clat)/((cls.earth_a + sqrt(-e2s2l2 + 1.0)*h_m)**2*sqrt(-e2s2l2 + 1.0)*clat**2)
 
         return cls( [ wp_en_x, wp_en_y, wp_en_z ], hvector=False )
+
+
+    @classmethod
+    def Jacobian_dwin_vNED(cls, lat_rad, h_m):
+        """
+        Calculates the Jacobian of w_in_n by vNED:
+        (by sympy!)
+
+            [ d(win_n_x)/dvN   d(win_n_x)/dvE   d(win_n_x)/dvD ]
+        J = | d(win_n_y)/dvN   d(win_n_y)/dvE   d(win_n_y)/dvD |
+            [ d(win_n_z)/dvN   d(win_n_z)/dvE   d(win_n_z)/dvD ]
+
+        Input:
+          lat_rad    :    [rad] latitude
+          h          :    [m]   altitude
+
+        """
+
+        Rphi = cls.Rphi(lat_rad)
+        Rlbd = cls.Rlambda(lat_rad)
+
+        J = cls( [
+            [     0,          1/(h_m + Rphi),          0   ],
+            [-1/(h_m + Rlbd),         0,               0   ],
+            [     0,    -tan(lat_rad)/(h_m + Rphi),    0   ],
+        ])
+
+        return J
+
+    @classmethod
+    def Jacobian_dwin_LH(cls, vN, vE, lat_rad, h_m):
+        """
+        Calculates the Jacobian of w_in_n by (lat/h):
+        (by sympy!)
+
+            [ d(win_n_x)/dlat    d(win_n_x)/dh ]
+        J = | d(win_n_y)/dlat    d(win_n_y)/dh ]
+            [ d(win_n_z)/dlat    d(win_n_z)/dh ]
+
+        Input:
+          vN      : [m/s] velocity-north
+          vE      : [m/s] velocity-east
+          lat_rad : [rad] latitude
+          h_m     : [m]   altitude above sea level
+
+        """
+        slat  = sin(lat_rad)
+        clat  = cos(lat_rad)
+        s2lat = sin(2*lat_rad)
+        c2lat = cos(2*lat_rad)
+        slat2 = slat**2
+        clat2 = clat**2
+        lat   = lat_rad
+        h     = h_m
+
+        J_00 = -1.0*cls.earth_a*cls.earth_e2*vE*slat**1.0*clat/((cls.earth_a + h*sqrt(-cls.earth_e2*slat2 + 1.0))**2*sqrt(-cls.earth_e2*slat2 + 1.0)) - cls.wie*slat
+
+        J_10 = -1.06066017177982*cls.earth_a*cls.earth_e2*vN*(cls.earth_e2 - 1.0)*(cls.earth_e2*c2lat - cls.earth_e2 + 2)**0.5*s2lat/(-cls.earth_a*cls.earth_e2 + cls.earth_a + h*(0.5*cls.earth_e2*c2lat - 0.5*cls.earth_e2 + 1)**1.5)**2
+
+        J_20 = (1.0*cls.earth_a*cls.earth_e2*vE*slat2 - vE*(cls.earth_a + h*sqrt(-cls.earth_e2*slat2 + 1.0))*(-cls.earth_e2*slat2 + 1.0)/clat2 - cls.wie*(cls.earth_a + h*sqrt(-cls.earth_e2*slat2 + 1.0))**2*sqrt(-cls.earth_e2*slat2 + 1.0)*clat)/(
+                (cls.earth_a + h*sqrt(-cls.earth_e2*slat2 + 1.0))**2*sqrt(-cls.earth_e2*slat2 + 1.0))
+
+        J_01 = vE*(cls.earth_e2*slat2 - 1.0)/(cls.earth_a + h*sqrt(-cls.earth_e2*slat2 + 1.0))**2
+
+        J_11 = vN*(-cls.earth_e2*slat2 + 1.0)**3.0/(cls.earth_a*(cls.earth_e2 - 1.0) - h*(-cls.earth_e2*slat2 + 1.0)**1.5)**2
+
+        J_21 = vE*(-cls.earth_e2*slat2 + 1.0)*tan(lat)/(cls.earth_a + h*sqrt(-cls.earth_e2*slat2 + 1.0))**2
+
+        J = cls( [
+            [J_00, J_01],
+            [J_10, J_11],
+            [J_20, J_21],
+        ])
+
+        return J
 
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
