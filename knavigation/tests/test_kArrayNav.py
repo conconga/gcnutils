@@ -321,41 +321,6 @@ class TestClass_kArrayNav:
         #plt.show(block=False)
         ###########################
 
-    def test_polar_projection(self):
-        print("==== polar projection ====")
-        phi = 10
-        tta = 20
-        C   = lambda psi: kArrayNav( [phi, tta, psi] ).to_rad().euler2C()
-
-        psi_0 = 30
-        dpsi  = 1
-        dC    = (C(psi_0 + dpsi) - C(psi_0)) / dpsi
-
-        psi_1 = 60
-        C_with_psi_1 = C(psi_0) + ((psi_1-psi_0) * dC) # using euler to integrate up to psi_1
-        aux = C_with_psi_1 * C_with_psi_1.T
-        print("before orthogonalization, C x C^T = \n", aux)
-        print("euler angles = ", C_with_psi_1.C2euler().to_deg())
-
-        # this test is valid if the main diagonal is of numbers far from 1.0:
-        for i in range(3):
-            for j in range(3):
-                if i == j:
-                    assert abs(aux[i][j] - 1.0) > 0.03
-
-        C90 = C_with_psi_1.polar_projection() # orthogonalizing the transformation matrix
-        aux = C90 * C90.T
-        print("after  orthogonalization, C x C^T = \n", aux)
-        print("euler angles = ", C90.C2euler().to_deg())
-
-        # we are looking for an identity matrix:
-        for i in range(3):
-            for j in range(3):
-                if i == j:
-                    assert abs(aux[i][j] - 1.0) < 1e-10
-                else:
-                    assert abs(aux[i][j]) < 1e-10
-
     def test_dLLH_to_south(self):
         dLLH = kArrayNav.dLLH_dt(-10,0,0,0,0).squeeze()
         assert dLLH[0] < -1e-6
@@ -381,7 +346,6 @@ class TestClass_kArrayNav:
         v   = 10 # [m/s] speed
         dV  = 30 # [m/s] delta speed
         return (lat, h, v, dV)
-
 
     def test_Jacobian_dwin_vNED_for_vN(self, fixture_JacobianSetup):
         lat, h, vN, dVn = fixture_JacobianSetup

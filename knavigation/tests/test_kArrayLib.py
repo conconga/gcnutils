@@ -7,6 +7,7 @@ print(f"** sys.path[0] = {sys.path[0]}")
 
 from knavigation import kArray
 import numpy as np
+import pytest
 from math import sqrt
 
 class TestClass_kArrayLib:
@@ -72,5 +73,27 @@ class TestClass_kArrayLib:
                     assert abs(identity[i,j] - 1.0) < 1e-10
                 else:
                     assert abs(identity[i,j]) < 1e-10
+
+    @pytest.mark.parametrize("method", [ 'qr', 'svd' ])
+    def test_orthogonalization(self, method):
+        print("==== orthogonalization ====")
+
+        # input:
+        A = kArray([
+               [  3,   9,  -9,  -9,  -7,],
+               [  5,  -4,  -7,  -4,  -7,],
+               [ -2,  -5,   3,   5,  -1,],
+               [  6,   1,   3, -10,  -8,],
+               [ -7,   4,  -5,  -9,   0,],
+        ])
+
+        C = A.to_orth(method)
+        assert C.inv() == C.T
+
+
+    def test_orthogonalization_wrong_method(self):
+        A = kArray([0])
+        with pytest.raises(NameError):
+            A.to_orth("dkfljsdl")
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
