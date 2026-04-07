@@ -19,6 +19,7 @@ print(f"** sys.path[0] = {sys.path[0]}")
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 import numpy as np
 from math import sqrt
+from scipy.linalg import svd, qr
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
@@ -73,5 +74,25 @@ class kArrayLib:
 
     def inv(self):
         return np.linalg.inv(self).view(self.__class__)
+
+    def to_orth(self, method="qr"):
+        """
+        Orthogonalizes the given matrix.
+
+        The methods are:
+           'qr'  :  decomposition QR
+           'svd' :  nearest orthogonal matrix to 'self' in Frobenius norm (using SVD)
+        """
+
+        if method == "qr":
+            Q, _ = qr(self, mode="economic")
+            return self.__class__(Q)
+
+        elif method == "svd":
+            U, s, Vt = svd(self, full_matrices=False)
+            return self.__class__(U @ Vt)
+
+        else:
+            raise NameError(f'method "{method}" is still not supported')
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>

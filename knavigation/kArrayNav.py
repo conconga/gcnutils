@@ -18,7 +18,6 @@ print(f"** __package__ = {__package__}")
 print(f"** sys.path[0] = {sys.path[0]}")
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 import numpy as np
-from scipy.linalg import svd
 from math     import sin, sqrt, cos, tan, atan, atan2, asin, pi
 from mpmath   import sec
 from .kArray  import kArray
@@ -316,17 +315,6 @@ class kNavTransformations(kNavLib):
         dpsi = aux * sec(theta)
 
         return self.__class__( [dphi, dtta, dpsi] )
-
-    def polar_projection(self):
-        """
-        Trick to ensure orthogonality of a transformation matrix, by
-        normalization of the eigenvalues. Also, it is the nearest orthogonal
-        matrix to M in Frobenius norm via polar (using SVD)
-        """
-
-        U, s, Vt = svd(self, full_matrices=False)
-        return self.__class__(U @ Vt)
-
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 
