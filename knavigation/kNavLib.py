@@ -7,8 +7,8 @@ Beschreibung: Some standard equations based on WGS-84 model of the earth.
 Autor: Luciano Auguto Kruk
 Erstellt am: 08.10.2025
 Version: 1.0.0
-Lizenz: 
-GitHub: 
+Lizenz:
+GitHub:
 """
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 from math import sqrt, sin, cos, tan
