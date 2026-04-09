@@ -68,7 +68,7 @@ class kArrayLib:
         if vtype in [ self.TYPE_HORIZONTAL, self.TYPE_VERTICAL ]:
             return sqrt( sum( [i**2 for i in self.squeeze()] ))
         elif vtype == self.TYPE_SINGLEVALUE:
-            return abs(self.squeeze())
+            return abs(float(self.squeeze()))
         else:
             raise(NameError(f"not prepared for type '{str(type(y))}' [self.__class__ = {self.__class__}]"))
 

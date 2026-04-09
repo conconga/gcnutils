@@ -9,8 +9,9 @@ from knavigation import kArrayNav, kArray
 import numpy as np
 import math
 import pytest
-from numpy import pi, dot
-from math  import sqrt
+from unittest.mock import patch
+from numpy         import pi, dot
+from math          import sqrt
 
 
 class TestClass_kArrayNav:
@@ -33,6 +34,10 @@ class TestClass_kArrayNav:
             euler_t = q4.Q2euler()
             for j,k in zip(euler, euler_t):
                 assert abs(j-k) < 1e-10
+
+    def test_Q2euler_with_incorrect_Q(self):
+        with pytest.raises(ValueError):
+            a = kArrayNav([1,2,3,4]).Q2euler()
 
     def test_Q2C_C2Q(self):
         print("==== Q2C / C2Q ====")
@@ -264,6 +269,24 @@ class TestClass_kArrayNav:
                 print("euler angles at [k+1] (from R)")
                 print(euler_from_R_inv)
                 print()
+
+    def test_dEulerDt_from_array(self):
+        a = kArrayNav([1,2,3]).dEulerDt( np.asarray([4,5,6]) )
+        b = kArrayNav( [[-12.27673069,  -2.34731438, -17.90033734]] )
+
+        for i,j in zip(a,b):
+            assert abs(i-j) < 1e-5
+
+    def test_dEulerDt_from_same_type(self):
+        a = kArrayNav([1,2,3]).dEulerDt( kArrayNav( [4,5,6]) )
+        b = kArrayNav( [[-12.27673069,  -2.34731438, -17.90033734]] )
+
+        for i,j in zip(a,b):
+            assert abs(i-j) < 1e-5
+
+    def test_dEulerDt_from_unknown(self):
+        with pytest.raises(NameError):
+            a = kArrayNav([1,2,3]).dEulerDt( (4,5,6) )
 
     def test_coherence_integrating_euler(self):
         # Tests #6

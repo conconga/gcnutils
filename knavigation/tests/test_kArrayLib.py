@@ -23,6 +23,14 @@ class TestClass_kArrayLib:
         assert all([i==j for i,j in zip(a.to_skew(),b)])
         print(a.to_skew())
 
+    def test_to_skew_with_4x1(self):
+        with pytest.raises(Exception):
+            a = kArray( [1,2,3,4], hvector=False ).to_skew()
+
+    def test_to_skew_with_matrix(self):
+        with pytest.raises(Exception):
+            a = kArray( [[1,2],[3,4]], hvector=False ).to_skew()
+
     def test_cross_product(self):
         print("==== cross product ====")
         a = kArray( [5,-2,4], hvector=True )
@@ -59,6 +67,13 @@ class TestClass_kArrayLib:
         print("||a|| = {:f}".format(abs(a)))
         a = kArray(-32)
         assert abs(abs(a) - 32.0) < 1e-10
+
+    def test_norm_scalar(self):
+        assert kArray( [[-3]] ).norm() == 3.0
+
+    def test_norm_matrix(self):
+        with pytest.raises(Exception):
+            assert kArray( [[1,2],[3,4]] ).norm()
 
     def test_matrix_inv(self):
         print("==== inv() ====")

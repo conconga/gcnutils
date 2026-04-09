@@ -35,6 +35,13 @@ class TestClass_kArray:
             assert mock_type.call_count == 1
 
     #----------------------------------------#
+    def test_type_unknown(self):
+        with patch.object(kArray, "_type") as mock_type:
+            mock_type.return_value = -999
+            with pytest.raises(Exception):
+                a = kArray([[1,2],[3,4]])
+
+    #----------------------------------------#
     @pytest.mark.parametrize(
             "content, vtype", [
                 ( [1],           kArray.TYPE_SINGLEVALUE ),

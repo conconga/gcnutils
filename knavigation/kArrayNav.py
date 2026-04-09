@@ -76,11 +76,7 @@ class kNavTransformations(kNavLib):
 
         phi   = atan2(2.0*((q[2]*q[3])+(q[0]*q[1])), (q[0]**2.0)-(q[1]**2.0)-(q[2]**2.0)+(q[3]**2.0));
         psi   = atan2(2.0*((q[1]*q[2])+(q[0]*q[3])), (q[0]**2.0)+(q[1]**2.0)-(q[2]**2.0)-(q[3]**2.0));
-        try:
-            theta = asin(2.0*((q[0]*q[2])-(q[1]*q[3])));
-        except ValueError:
-            print("ERR: norm(Q) = {:f}".format(np.sqrt(np.sum(q**2))))
-            theta = 0;
+        theta = asin(2.0*((q[0]*q[2])-(q[1]*q[3])));
 
         return self.__class__( (phi, theta, psi) )
 
@@ -304,7 +300,7 @@ class kNavTransformations(kNavLib):
 
         if isinstance(w, list):
             b = w
-        elif isinstance(w, self.__class__):
+        elif isinstance(w, (self.__class__, np.ndarray)):
             b = w.squeeze().tolist()
         else:
             raise(NameError("this type is still not supported"))
