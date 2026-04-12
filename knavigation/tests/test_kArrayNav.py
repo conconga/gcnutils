@@ -467,5 +467,52 @@ class TestClass_kArrayNav:
 
         assert abs(JxdLH) == kArrayNav(np.zeros((3,1)))
 
+    def test_w_ie_n(self):
+        lat = 10 * pi/180
+
+        w_ie_n = kArrayNav.w_ie_n(lat)
+        assert w_ie_n[0][0] > 7e-5
+        assert abs(w_ie_n[1][0]) < 1e-12
+        assert w_ie_n[2][0] < 0
+
+    @pytest.fixture
+    def fixture_w_xx_n(self):
+        lat = 10 * pi/180
+        lon = 10 * pi/180
+        h   = 300
+        vN  = -30
+        vE  = +30
+
+        return lat, lon, h, vN, vE
+
+
+    def test_w_en_n(self, fixture_w_xx_n):
+        lat, lon, h, vN, vE = fixture_w_xx_n
+
+        dLat   = kArrayNav.dLat_dt(vN,lat,h)
+        assert dLat < 0 # vN < 0
+
+        dLon   = kArrayNav.dLong_dt(vE,lat,h)
+        assert dLon > 0 # vE > 0
+
+        w_en_n = kArrayNav.w_en_n(dLat, dLon, lat)
+        assert w_en_n[0][0] > 0
+        assert w_en_n[1][0] > 0
+
+    def test_w_in_n(self, fixture_w_xx_n):
+        lat, lon, h, vN, vE = fixture_w_xx_n
+
+        # 1)
+        w_ie_n = kArrayNav.w_ie_n(lat)
+
+        # 2)
+        dLat   = kArrayNav.dLat_dt(vN,lat,h)
+        dLon   = kArrayNav.dLong_dt(vE,lat,h)
+        w_en_n = kArrayNav.w_en_n(dLat, dLon, lat)
+
+        # 3)
+        w_in_n = kArrayNav.w_in_n(vN, vE, lat, h)
+
+        assert (w_ie_n + w_en_n) == w_in_n
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>

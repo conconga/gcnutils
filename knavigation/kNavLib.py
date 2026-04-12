@@ -176,6 +176,26 @@ class kNavLib:
         ], hvector=False )
 
     @classmethod
+    def w_in_n(cls, vN, vE, lat_rad, h_m):
+        """
+        Calculates the angular velocity of the navigation frame resolved for 'n'.
+
+        : Inputs:
+        :
+        :  vN      [m/s]  velocity north
+        :  vE      [m/s]  velocity east
+        :  lat_rad [rad]  latitude
+        :  h_m     [m]    height
+        """
+
+        dLatDt = cls.dLat_dt(vN, lat_rad, h_m)
+        dLonDt = cls.dLong_dt(vE, lat_rad, h_m)
+        w_ie_n = cls.w_ie_n(lat_rad)
+        w_en_n = cls.w_en_n(dLatDt, dLonDt, lat_rad)
+
+        return w_ie_n + w_en_n
+
+    @classmethod
     def dWen_dt(cls, lat_rad, vN, vE, vD, h_m, vNp, vEp):
         """
         Calculates the first derivative of w_en_n, i.e d(w_en_n)/dt.
