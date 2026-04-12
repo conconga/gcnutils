@@ -430,7 +430,7 @@ class TestClass_kArrayNav:
 
         assert abs(JxdVd) == kArrayNav( np.zeros((3,1)) )
 
-    def test_Jacobian_dWin_LH_for_lat(self):
+    def test_Jacobian_dWin_LLH_for_lat(self):
         lat  = 50 * pi/180 # [rad] latitude
         dlat =  1 * pi/180 # [rad] delta latitude
         h    = 100 # [m] altitude
@@ -450,22 +450,22 @@ class TestClass_kArrayNav:
         print("\ndelta =\n", delta)
 
         # J x dVn:
-        JxdLH = kArrayNav.Jacobian_dwin_LH(0,0,lat,h) * kArrayNav( [dlat, 0], hvector=False )
-        print("\nJ x dLH =\n", JxdLH)
+        JxdLLH = kArrayNav.Jacobian_dwin_LLH(0,0,lat,h) * kArrayNav( [dlat, 0, 0], hvector=False )
+        print("\nJ x dLLH =\n", JxdLLH)
 
-        assert abs(delta[0][0] - JxdLH[0][0]) < 1e-8
-        assert abs(delta[1][0] - JxdLH[1][0]) < 1e-14
-        assert abs(delta[2][0] - JxdLH[2][0]) < 1e-8
+        assert abs(delta[0][0] - JxdLLH[0][0]) < 1e-8
+        assert abs(delta[1][0] - JxdLLH[1][0]) < 1e-14
+        assert abs(delta[2][0] - JxdLLH[2][0]) < 1e-8
 
-    def test_Jacobian_dWin_LH_for_h(self):
+    def test_Jacobian_dWin_LLH_for_h(self):
         lat  = 50 * pi/180 # [rad] latitude
         h    = 100 # [m] altitude
         dh   =   1 # [m] delta altitude
 
         # J x dVn:
-        JxdLH = kArrayNav.Jacobian_dwin_LH(0,0,lat,h) * kArrayNav( [0, dh], hvector=False )
+        JxdLLH = kArrayNav.Jacobian_dwin_LLH(0,0,lat,h) * kArrayNav( [0, 0, dh], hvector=False )
 
-        assert abs(JxdLH) == kArrayNav(np.zeros((3,1)))
+        assert abs(JxdLLH) == kArrayNav(np.zeros((3,1)))
 
     def test_w_ie_n(self):
         lat = 10 * pi/180

@@ -250,14 +250,14 @@ class kNavLib:
         return J
 
     @classmethod
-    def Jacobian_dwin_LH(cls, vN, vE, lat_rad, h_m):
+    def Jacobian_dwin_LLH(cls, vN, vE, lat_rad, h_m):
         """
         Calculates the Jacobian of w_in_n by (lat/h):
         (by sympy!)
 
-            [ d(win_n_x)/dlat    d(win_n_x)/dh ]
-        J = | d(win_n_y)/dlat    d(win_n_y)/dh ]
-            [ d(win_n_z)/dlat    d(win_n_z)/dh ]
+            [ d(win_n_x)/dlat   d(win_n_x)/dlon   d(win_n_x)/dh ]
+        J = | d(win_n_y)/dlat   d(win_n_y)/dlon   d(win_n_y)/dh ]
+            [ d(win_n_z)/dlat   d(win_n_z)/dlon   d(win_n_z)/dh ]
 
         Input:
           vN      : [m/s] velocity-north
@@ -289,9 +289,9 @@ class kNavLib:
         J_21 = vE*(-cls.earth_e2*slat2 + 1.0)*tan(lat)/(cls.earth_a + h*sqrt(-cls.earth_e2*slat2 + 1.0))**2
 
         J = cls( [
-            [J_00, J_01],
-            [J_10, J_11],
-            [J_20, J_21],
+            [J_00, 0.0, J_01],
+            [J_10, 0.0, J_11],
+            [J_20, 0.0, J_21],
         ])
 
         return J
