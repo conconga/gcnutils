@@ -16,8 +16,12 @@ from math          import sqrt
 
 class TestClass_kArrayNav:
 
+    def get_random_euler_rad(self):
+        # vector [3] with random euler angles [-pi/2, pi/2]
+        #return np.asarray([10,20,30]) * pi/180
+        return (((np.random.rand(1,3)*2.0)-1)*90) * pi/180
+
     def test_to_rad_to_deg(self):
-        print("==== to_rad, to_deg ====")
         euler_deg   = kArrayNav( [-30, 10, 170] )
         euler_rad   = euler_deg.to_rad()
         euler_deg_t = euler_rad.to_deg()
@@ -26,10 +30,8 @@ class TestClass_kArrayNav:
             assert abs(i-j) < 1e-10
 
     def test_euler_Q_euler(self):
-        print("==== euler - Q - euler ====")
         for i in range(20):
-            euler_rad = (((np.random.rand(1,3) * 2.0) - 1.0) * 90.) * pi/180
-            euler   = kArrayNav( euler_rad )
+            euler   = kArrayNav( self.get_random_euler_rad() )
             q4      = euler.euler2Q()
             euler_t = q4.Q2euler()
             for j,k in zip(euler, euler_t):
@@ -39,11 +41,22 @@ class TestClass_kArrayNav:
         with pytest.raises(ValueError):
             a = kArrayNav([1,2,3,4]).Q2euler()
 
+    def test_Q2C(self):
+        print("==== Q2C ====")
+        for i in range(50):
+            euler_rad = kArrayNav( self.get_random_euler_rad() )
+
+            q  = euler_rad.euler2Q()
+            C1 = q.Q2C()
+            C2 = q._Q2C()
+
+            for j,k in zip(C1, C2):
+                assert abs(j-k) < 1e-10
+
     def test_Q2C_C2Q(self):
         print("==== Q2C / C2Q ====")
-        for i in range(20):
-            euler_rad = (((np.random.rand(1,3) * 2.0) - 1.0) * 90.) * pi/180
-            euler   = kArrayNav( euler_rad )
+        for _ in range(20):
+            euler = kArrayNav( self.get_random_euler_rad() )
             q4    = euler.euler2Q()
             C     = q4.Q2C()
             euler_t = C.C2euler()
@@ -54,15 +67,32 @@ class TestClass_kArrayNav:
 
             for j,k in zip(q4, q4_t):
                 assert abs(j-k) < 1e-10
-    
-    def test_q1_x_q2(self):
-        print("==== q1_x_q2 ====")
-        for i in range(20):
-            euler_rad = (((np.random.rand(1,3) * 2.0) - 1.0) * 90.) * pi/180
-            Ca2b = kArrayNav( euler_rad ).euler2C()
-            qa2b = kArrayNav( euler_rad).euler2Q()
 
-            euler_rad = (((np.random.rand(1,3) * 2.0) - 1.0) * 90.) * pi/180
+    def test_q1_x_q2_tests_on_C(self):
+        for _ in range(50):
+            euler_rad = kArrayNav( self.get_random_euler_rad() )
+            Ca2b = kArrayNav( euler_rad ).euler2C()
+            qa2b = kArrayNav( euler_rad ).euler2Q()
+
+            euler_rad = kArrayNav( self.get_random_euler_rad() )
+            Cb2c = kArrayNav( euler_rad ).euler2C()
+            qb2c = kArrayNav( euler_rad ).euler2Q()
+
+            Ca2c = Cb2c * Ca2b
+            qa2c = qb2c.q1_x_q2(qa2b)
+            #qa2c = qa2b.q1_x_q2(qb2c)
+            C    = qa2c.Q2C()
+
+            for j,k in zip(Ca2c, C):
+                assert abs(j-k) < 1e-10
+
+    def test_q1_x_q2_tests_on_euler(self):
+        for _ in range(50):
+            euler_rad = kArrayNav( self.get_random_euler_rad() )
+            Ca2b = kArrayNav( euler_rad ).euler2C()
+            qa2b = kArrayNav( euler_rad ).euler2Q()
+
+            euler_rad = kArrayNav( self.get_random_euler_rad() )
             Cb2c = kArrayNav( euler_rad ).euler2C()
             qb2c = kArrayNav( euler_rad ).euler2Q()
 
@@ -75,6 +105,27 @@ class TestClass_kArrayNav:
             for j,k in zip(euler, euler_t):
                 assert abs(j-k) < 1e-10
 
+
+    def test_q1_x_q2_tests_on_q(self):
+        for _ in range(50):
+            euler_rad = kArrayNav( self.get_random_euler_rad() )
+            qa2b = kArrayNav( euler_rad).euler2Q()
+
+            euler_rad = kArrayNav( self.get_random_euler_rad() )
+            qb2c = kArrayNav( euler_rad ).euler2Q()
+
+            qa2c = qb2c.q1_x_q2(qa2b)
+            qnew = qb2c._q1_x_q2(qa2b)
+
+            for i,j in zip(qa2c, qnew):
+                assert (i-j) < 1e-10
+
+            e1 = qa2c.Q2euler().to_deg()
+            e2 = qnew.Q2euler().to_deg()
+
+            for i,j in zip(e1,e2):
+                assert (i-j) < 1e-10
+
     def test_Re2n(self):
         print("==== Re2n ====")
         Re2n = kArrayNav().Re2n(0,0)
@@ -82,12 +133,12 @@ class TestClass_kArrayNav:
 
     def test_llh_xyz_e(self):
         print("==== llh / xyz_e ====")
-        for i in range(20):
-            angles_rad = (((np.random.rand(1,3) * 2.0) - 1.0) * 90.) * pi/180
+        for _ in range(20):
+            angles_rad = kArrayNav( self.get_random_euler_rad() )
             llh   = kArrayNav( angles_rad )
             xyz   = llh.ecef_llh2xyz()
             llh_t = xyz.ecef_xyz2llh()
-        
+
             for i,j in zip(llh, llh_t):
                 #print("{:f} == {:f} ?".format(i,j))
                 assert abs(i-j) < 1e-3
@@ -136,7 +187,7 @@ class TestClass_kArrayNav:
 
             # and described at b:
             F_b = (kArrayNav(y).Q2C() * F_i).to_list()
-            euler_expected = kArrayNav((t * w_ib_i)).to_deg() 
+            euler_expected = kArrayNav((t * w_ib_i)).to_deg()
 
             print(f'F_b(phi = {euler[0]:1.03f}) = [ {F_b[0]:1.03f} {F_b[1]:1.03f} {F_b[2]:1.03f} ]')
             print(f'euler_expected = {euler_expected:2.2f}')
@@ -195,7 +246,7 @@ class TestClass_kArrayNav:
         Cb2n_step = Cb2n + (0.01 * Cb2n_p) # small integration step
         euler  = Cb2n_step.T.C2euler()     # transposing to obtain the euler again
         assert euler[0][2] > 0
-        
+
     def test_coherence_rotation_changes_all_euler(self):
         # Tests #3
         # An angular velocity [1,1,1] shall increase all euler angles.

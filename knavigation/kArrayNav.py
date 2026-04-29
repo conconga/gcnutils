@@ -7,8 +7,8 @@ Beschreibung: Mathematical manipulation of vectors and matrices as needed by nav
 Autor: Luciano Auguto Kruk
 Erstellt am: 06.09.2025
 Version: 1.0.0
-Lizenz: 
-GitHub: 
+Lizenz:
+GitHub:
 """
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 import sys
@@ -38,21 +38,21 @@ class kNavTransformations(kNavLib):
     def euler2Q(self):
         """
         Navigation -- from euler to Q.
-        : input: kArray = [phi, theta, psi]
-        : parameter : phi   [rad]
-        : parameter : theta [rad]
-        : parameter : psi   [rad]
-        : return: kArray = Q4
+        (Titterton (3.65))
+
+        **Remark** Farrell represents quaternions with its real element at the
+            last position, after the imaginary components.
+
+        Input:
+            euler angles (kArray)  :  [rad]  [phi, theta, psi]
+
+        Return
+            (kArray)  :  Q4 (a + b.i + c.j + d.k)
         """
         array = self.squeeze()
         assert len(array) == 3
-        phi   = array[0]
-        theta = array[1]
-        psi   = array[2]
 
-        half_phi   = 0.5*phi
-        half_theta = 0.5*theta
-        half_psi   = 0.5*psi;
+        half_phi, half_theta, half_psi = (0.5*i for i in array)
 
         return self.__class__( [
             (cos(half_phi)*cos(half_theta)*cos(half_psi)) + (sin(half_phi)*sin(half_theta)*sin(half_psi)),
@@ -64,37 +64,54 @@ class kNavTransformations(kNavLib):
     def Q2euler(self):
         """
         Navigation -- from Q to euler.
-        : input: kArray = Q4
-        : output   : phi   [rad]
-        : output   : theta [rad]
-        : output   : psi   [rad]
-        : return: kArray( [phi, theta, psi] )
+        (Titterton (3.66))
+
+        Input:
+            Q4 (a + b.i + c.j + d.k)  :  quaternions
+
+        Return:
+            (kArray) [rad] [phi, theta, psi]
         """
 
         q     = self.squeeze()
         assert len(q) == 4
 
-        phi   = atan2(2.0*((q[2]*q[3])+(q[0]*q[1])), (q[0]**2.0)-(q[1]**2.0)-(q[2]**2.0)+(q[3]**2.0));
-        psi   = atan2(2.0*((q[1]*q[2])+(q[0]*q[3])), (q[0]**2.0)+(q[1]**2.0)-(q[2]**2.0)-(q[3]**2.0));
-        theta = asin(2.0*((q[0]*q[2])-(q[1]*q[3])));
+        c11 = (q[0]**2.0) + (q[1]**2.0) - (q[2]**2.0) - (q[3]**2.0) # C[0,0]
+        c21 = 2.0 * ((q[1]*q[2]) + (q[0]*q[3]))                     # C[0,1] <= transpose
+        c31 = 2.0 * ((q[1]*q[3]) - (q[0]*q[2]))                     # C[0,2] <= transpose
+        c32 = 2.0 * ((q[2]*q[3]) + (q[0]*q[1]))                     # C[1,2] <= transpose
+        c33 = (q[0]**2.0) - (q[1]**2.0) - (q[2]**2.0) + (q[3]**2.0) # C[2,2]
+
+        phi   = atan2(c32, c33)
+        psi   = atan2(c21, c11)
+        theta = asin(-c31)
 
         return self.__class__( (phi, theta, psi) )
 
     def Q2C(self):
         """
         Navigation -- from Q to C.
+        (Titterton (3.59))
+
+        **Remark**: See the remark in the docstring of `euler2C()`. The equation (3.63)
+            shows that Titterton uses also here the transpose of the rotation
+            from the static frame to the rotating frame.
 
         If Q represents the transformation from 'a' to 'b', the matrix
         'C' represents 'Ca2b'.
 
-        : input    : kArray = q
-        : output   : C
+        Input:
+            Q4 (a + b.i + c.j + d.k)  :  quaternions
+
+        Return:
+            C : transformation matrix
+
         """
 
         q = self.squeeze()
         assert len(q) == 4
 
-        C = kArray( np.empty((3,3)) )
+        C = np.empty((3,3))
         C[0,0] = (q[0]**2.0) + (q[1]**2.0) - (q[2]**2.0) - (q[3]**2.0);
         C[0,1] = 2.0 * ((q[1]*q[2]) + (q[0]*q[3]));
         C[0,2] = 2.0 * ((q[1]*q[3]) - (q[0]*q[2]));
@@ -109,58 +126,91 @@ class kNavTransformations(kNavLib):
 
         return self.__class__( C )
 
+    def _Q2C(self):
+        """
+        Same as Q2C(), but calculated using a theoretical equation:
+
+        For a q = [s v^T], then
+
+        C = (s^2 - v^T.v).I + 2.v.v^T -2.s.(v x)
+        """
+        q = self.squeeze()
+        assert len(q) == 4
+
+        s = q[0]
+        v = self.__class__(q[1:], hvector=False)
+
+        return (((s*s) - (v.T*v))*np.eye(3)) + (2 * v * v.T) - (2*s*v.to_skew())
+
+
     def C2euler(self):
         """
         Navigation -- from C to (phi,theta,psi)[rad]
+        (Titterton (3.66))
+
+        **Remark**: See the remark in the docstring of `euler2C()`. The approach here
+            is described by Titterton (3.66), but with the transposed transformation
+            matrix.
+
+        Input:
+            C : transformation matrix
+
+        Return:
+            (kArray) [rad] [phi, theta, psi]
         """
 
-        C = self
-        assert C.shape == (3,3)
-        assert(C[2,2] != 0)
-        assert(C[0,0] != 0)
-        assert(C[0,2]>=-1 and C[0,2]<=1)
+        c11 = self[0,0]
+        c21 = self[0,1] # <= transpose
+        c31 = self[0,2] # <= transpose
+        c32 = self[1,2] # <= transpose
+        c33 = self[2,2]
 
-        phi   = np.arctan2(C[1,2], C[2,2])
-        theta = np.arcsin(-C[0,2])
-        psi   = np.arctan2(C[0,1], C[0,0])
+        phi   = atan2(c32, c33)
+        psi   = atan2(c21, c11)
+        theta = asin(-c31)
 
         return self.__class__( (phi, theta, psi) )
 
     def euler2C(self):
         """
-        : Convert euler [rad] to C matrix.
-        : order = [phi, theta, psi] [rad]
+        Convert euler [rad] to C matrix.
+        (Titterton (3.63))
+
+        **Remark**: the euler angles describe rotations of a frame (eg. body)
+            over another (eg. navigation/tangent), and the transformation
+            matrix is calculated by multiplying the individual rotations around
+            Z-Y-X. Titterton does like this, but at (3.48) he transposes the
+            transformation matrix and shows the transformation from the rotated
+            frame to the static one. This method solves (3.47) instead, from the
+            static to the rotated frame. See Farrell (2.31) for this result.
+
+        Inputs:
+            euler angles [phi, theta, psi] [rad]
+
+        Return:
+            C  :  Transformation Matrix
         """
 
         a = self.squeeze()
         assert len(a) == 3
 
-        if False:
-            phi    = a[0]
-            theta  = a[1]
-            psi    = a[2]
-            cphi   = cos(phi)
-            ctheta = cos(theta)
-            cpsi   = cos(psi)
-            sphi   = sin(phi)
-            stheta = sin(theta)
-            spsi   = sin(psi)
+        sphi, stheta, spsi = (sin(i) for i in a)
+        cphi, ctheta, cpsi = (cos(i) for i in a)
 
-            #C = self.__class__( np.empty((3,3)) )
-            C = self.__class__.empty((3,3))
-            C[0][0] = cpsi*ctheta
-            C[0][1] = spsi*ctheta
-            C[0][2] = -stheta
-            C[1][0] = (-spsi*cphi) + (cpsi*stheta*sphi)
-            C[1][1] = (cpsi*cphi) + (spsi*stheta*sphi)
-            C[1][2] = ctheta * sphi
-            C[2][0] = (spsi*sphi) + (cpsi*stheta*cphi)
-            C[2][1] = (-cpsi*sphi) + (spsi*stheta*cphi)
-            C[2][2] = ctheta * cphi
+        C = np.empty((3,3))
+        C[0][0] = ctheta * cpsi
+        C[0][1] = ctheta * spsi
+        C[0][2] = -stheta
 
-            #return C
+        C[1][0] = (sphi*stheta*cpsi) - (cphi*spsi)
+        C[1][1] = (cphi*cpsi) + (sphi*stheta*spsi)
+        C[1][2] = sphi*ctheta
 
-        return self.__class__( a ).euler2Q().Q2C()
+        C[2][0] = (sphi*spsi) + (cphi*stheta*cpsi)
+        C[2][1] = (cphi*stheta*spsi) - (sphi*cpsi)
+        C[2][2] = cphi*ctheta
+
+        return self.__class__( C )
 
     def C2Q(self):
         """
@@ -180,6 +230,7 @@ class kNavTransformations(kNavLib):
     def q1_x_q2(self, q2):
         """
         Navigation -- multiplies two quaternions
+        (Titterton (3.55)-(3.56))
 
         Let q1 represent C_a2b, and q2 represent C_b2c.
         The product C_a2c = C_b2c.C_a2b might be represented
@@ -195,13 +246,14 @@ class kNavTransformations(kNavLib):
         assert len(q2) == 4
 
         q3 = np.array([
-            (q1[0]*q2[0])-(q2[1]*q1[1])-(q2[2]*q1[2])-(q2[3]*q1[3]),
-            (q2[0]*q1[1])+(q2[1]*q1[0])+(q2[2]*q1[3])-(q2[3]*q1[2]),
-            (q2[0]*q1[2])+(q2[2]*q1[0])-(q2[1]*q1[3])+(q2[3]*q1[1]),
-            (q2[0]*q1[3])+(q2[3]*q1[0])+(q2[1]*q1[2])-(q2[2]*q1[1])
+            (q1[0]*q2[0])-(q1[1]*q2[1])-(q1[2]*q2[2])-(q1[3]*q2[3]),
+            (q1[1]*q2[0])+(q1[0]*q2[1])-(q1[3]*q2[2])+(q1[2]*q2[3]),
+            (q1[2]*q2[0])+(q1[0]*q2[2])+(q1[3]*q2[1])-(q1[1]*q2[3]),
+            (q1[3]*q2[0])+(q1[0]*q2[3])-(q1[2]*q2[1])+(q1[1]*q2[2])
         ])
 
-        return self.__class__( q3 )
+        return self.__class__( q3, hvector=False )
+
 
     def ecef_llh2xyz(self):
         """
@@ -287,16 +339,20 @@ class kNavTransformations(kNavLib):
     def dEulerDt(self, w):
         """
         Calculates the derivative vector of the euler angles.
-        See Titerton (3-52).
-        : input  : [phi, theta, psi] [rad]
-        : return : d[phi, theta, psi]/dt [rad/s]
+        (Titterton (3-52))
+
+        Inputs:
+                euler angles : [rad]   [phi, thetha, psi]
+            w : angular vel. : [rad/s] [wx, wy, wz]
+
+        Return:
+            d[phi, theta, psi]/dt [rad/s]
         """
 
         a = self.squeeze()
         assert len(a) == 3
-        phi    = a[0]
-        theta  = a[1]
-        psi    = a[2]
+
+        phi, theta, psi = a # [rad]
 
         if isinstance(w, list):
             b = w
