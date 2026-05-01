@@ -77,7 +77,10 @@ class kArrayCommon:
 
     def _do_format(self, fmt):
         size  = self.shape
-        txt = self._do_format_2D(fmt, *size)
+        if len(size) == 2:
+            txt = self._do_format_2D(fmt, *size)
+        else:
+            txt = str(np.asarray(self))
         return txt
 
     #( --- miscelaneous --- )#
