@@ -117,10 +117,10 @@ euler = q4.Q2euler()
 
 ### how to understand the relationship between euler-angles, quaternions and transformation matrices
 
-**Disclaimer** Although referred to as *Euler* angles as commonly used by the
-aeronautic aerospace literature, we should rename it to *Tait-Bryan* angles. I
-acknowledge here that the difference is known, the usage is wrong, but I move
-on with the deviation to mitigate confusion.
+**Disclaimer**: Although addressed to as *Euler* angles, I acknowledge here
+that the correct denomination should be *Tait-Bryan* angles.  The term *Euler
+angles* is abundant in the aeronautic and aerospace literature though, and
+therefore I move on with the deviation to mitigate confusion.
 
 Given three angles that describe the relationship between two reference frames,
 say frames a^ and b^, the classes in this package are build to, from the euler
