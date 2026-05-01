@@ -227,6 +227,15 @@ class kNavTransformations(kNavLib):
         ret   = [tmp[0]] + [-i for i in tmp[1:]]
         return self.__class__( np.asarray(ret).reshape(shape) / sum( [i**2 for i in ret] ))
 
+    def q_conj(self):
+        """
+        Calculates the conjugated quaternion of the input.
+
+        **Remark**: the first element is the real part of the quaternion here: (a + b.i + c.j + d.k)
+        """
+        #return self.__class__( np.hstack(([self[0]] + [-i for i in self[1:]])), hvector=False )
+        return self.__class__( [-i if idx >= 1 else i for idx,i in enumerate(self) ], hvector=False )
+
     def q1_x_q2(self, q2):
         """
         Navigation -- multiplies two quaternions
@@ -253,6 +262,48 @@ class kNavTransformations(kNavLib):
         ])
 
         return self.__class__( q3, hvector=False )
+
+    def q_x_3d(self, vector):
+        """
+        Resolves a vector in another frame.
+        This is similar to Ca2b x vector, but directly using quaternions.
+        (Titterton (3.57))
+
+        The operation performed here is this:
+        r2 = q . r1 . q*
+        where r1 and r2 are vectors in quaternion-form (real part = 0), but
+        with the inverse of `q`.
+
+        With some algebra, the result above is the same as the operating the
+        transformation backwards, or using the transpose of `Q2C()`. See the
+        **remark** in the docstring of `Q2C()`.
+
+        Inputs:
+            Q4 (a + b.i + c.j + d.k)  :  quaternions
+            vector                    :  3D vector
+
+        Returns
+            vector  :   3D vector resolved in another frame
+
+        """
+
+        q = self.q_inv().squeeze() # <== first, use the inverse
+        v = vector.squeeze()
+
+        # checks:
+        assert len(q) == 4
+        assert len(v) == 3
+
+        # augmenting v to be an imaginary quaternion:
+        v = np.hstack((0, v))
+
+        # conjugate q:
+        q_j = q.q_conj()
+
+        # transformed vector (without the real part):
+        ret = self.__class__(q).q1_x_q2(v).q1_x_q2(q_j)[1:] # <= to remove the real part
+
+        return ret
 
 
     def ecef_llh2xyz(self):

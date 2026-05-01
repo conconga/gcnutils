@@ -29,6 +29,16 @@ class TestClass_kArrayNav:
         for i,j in zip(euler_deg, euler_deg_t):
             assert abs(i-j) < 1e-10
 
+    def test_quat_conjugate(self):
+        q  = kArrayNav( [1,2,3,4], hvector=False )
+        qj = q.q_conj()
+
+        for i in range(4):
+            if i == 0:
+                assert abs(q[i] - qj[i]) < 1e-10
+            else:
+                assert abs(q[i] + qj[i]) < 1e-10
+
     def test_euler_Q_euler(self):
         for i in range(20):
             euler   = kArrayNav( self.get_random_euler_rad() )
@@ -68,7 +78,20 @@ class TestClass_kArrayNav:
             for j,k in zip(q4, q4_t):
                 assert abs(j-k) < 1e-10
 
-    def test_q1_x_q2_tests_on_C(self):
+    def test_q_x_3d(self):
+        vector = kArrayNav( [1,2,-3], hvector=False )
+        for _ in range(30):
+            euler = kArrayNav( self.get_random_euler_rad() )
+
+            v1 = euler.euler2C() * vector
+            v2 = euler.euler2Q().q_x_3d(vector)
+
+            norm2_v1 = sum([i**2 for i in v1])
+            norm2_v2 = sum([i**2 for i in v2])
+
+            assert abs(norm2_v1 - norm2_v2) < 1e-10
+            assert v1 == v2
+    
         for _ in range(50):
             euler_rad = kArrayNav( self.get_random_euler_rad() )
             Ca2b = kArrayNav( euler_rad ).euler2C()
