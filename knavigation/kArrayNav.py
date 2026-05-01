@@ -251,7 +251,7 @@ class kNavTransformations(kNavLib):
         q1 = self.squeeze()
         assert len(q1) == 4
 
-        if isinstance(q2, kArrayNav) or isinstance(kArray):
+        if isinstance(q2, kArrayNav) or isinstance(q2, kArray):
             q2 = q2.squeeze()
         assert len(q2) == 4
 
