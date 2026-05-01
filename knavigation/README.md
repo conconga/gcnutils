@@ -24,26 +24,32 @@
   - [<span class="toc-section-number">2.9</span> to convert from/to
     euler angles to/from
     transformation-matrix:](#to-convert-fromto-euler-angles-tofrom-transformation-matrix)
-  - [<span class="toc-section-number">2.10</span> to multiply
-    quaternions:](#to-multiply-quaternions)
-  - [<span class="toc-section-number">2.11</span> transformation matrix
+  - [<span class="toc-section-number">2.10</span> transformation matrix
     from ‘earth’ to ‘navigation’
     frame:](#transformation-matrix-from-earth-to-navigation-frame)
-  - [<span class="toc-section-number">2.12</span> transformation among
+  - [<span class="toc-section-number">2.11</span> transformation among
     earth-centered-earth-fixed
     representations:](#transformation-among-earth-centered-earth-fixed-representations)
-  - [<span class="toc-section-number">2.13</span> derivative of
-    quaternions:](#derivative-of-quaternions)
-  - [<span class="toc-section-number">2.14</span> inverse of a
-    quaternion:](#inverse-of-a-quaternion)
-  - [<span class="toc-section-number">2.15</span> derivative of euler
+  - [<span class="toc-section-number">2.12</span> derivative of euler
     angles:](#derivative-of-euler-angles)
-  - [<span class="toc-section-number">2.16</span> local gravity in
+  - [<span class="toc-section-number">2.13</span> local gravity in
     geografic frame:](#local-gravity-in-geografic-frame)
-  - [<span class="toc-section-number">2.17</span> derivative of
+  - [<span class="toc-section-number">2.14</span> derivative of
     lat/long/alt:](#derivative-of-latlongalt)
-  - [<span class="toc-section-number">2.18</span> to apply a function on
+  - [<span class="toc-section-number">2.15</span> to apply a function on
     the current array:](#to-apply-a-function-on-the-current-array)
+  - [<span class="toc-section-number">2.16</span> Quaternion
+    Operations](#quaternion-operations)
+    - [<span class="toc-section-number">2.16.1</span>
+      multiplication:](#multiplication)
+    - [<span class="toc-section-number">2.16.2</span>
+      inverse:](#inverse)
+    - [<span class="toc-section-number">2.16.3</span>
+      derivative:](#derivative)
+    - [<span class="toc-section-number">2.16.4</span>
+      conjugate:](#conjugate)
+    - [<span class="toc-section-number">2.16.5</span> transform a vector
+      with quaternions:](#transform-a-vector-with-quaternions)
 - [<span class="toc-section-number">3</span> How to test
   it](#how-to-test-it)
 
@@ -119,13 +125,6 @@ C     = euler.euler2C()
 euler = C.C2euler().to_deg()
 ```
 
-## to multiply quaternions:
-```
-qa2b = ...                  # from 'a' to 'b'
-qb2c = ...                  # from 'b' to 'c'
-qa2c = qb2c.q1_x_q2(qa2b)   # from 'a' to 'c'
-```
-
 ## transformation matrix from 'earth' to 'navigation' frame:
 ```
 latitude_rad  = ...
@@ -138,19 +137,6 @@ Re2n = kArrayNav().Re2n(latitude_rad, longitude_rad)
 llh = kArrayNav( [lat_rad, long_rad, altitude_m] ) # latitude, longitude, altitude
 xyz = llh.ecef_llh2xyz()                           # x_e, y_e, z_e [m]
 llh = xyz.ecef_xyz2llh()
-```
-
-## derivative of quaternions:
-```
-dqdt = qi2b.dqdt( w_ib_b )
-```
-
-## inverse of a quaternion:
-```
-euler = kArrayNav( [10,20,30] ).to_rad()
-q4    = euler.euler2Q()
-q_inv = q4.Qinv()
-e2    = q_inv.Q2euler().to_deg()
 ```
 
 ## derivative of euler angles:
@@ -177,6 +163,51 @@ b = a.apply(lambda x: np.linalg.inv(x))
 ```
 
 Note: the class `kArrayNav` includes a `.inv()` method anyhow.. 
+
+## Quaternion Operations
+
+### multiplication:
+```
+qa2b = ...                  # from 'a' to 'b'
+qb2c = ...                  # from 'b' to 'c'
+qa2c = qa2b.q_x_q(qb2c)     # from 'a' to 'c' <= yes, in the order
+```
+
+While cascading transformation are done in reverse order with affines, it follows the direct order with quaternions.
+For example, if `C_a2b` and `C_b2c` are transformation matrices, while the respective quaternions are `q_a2b` and
+`q_b2c`, the composition of the transformations are:
+
+```latex
+C_a2c = C_c2b * C_a2b
+q_a2c = q_a2b o q_b2c # where 'o' stands for the quaternion multiplication operator, q_x_q().
+```
+
+### inverse:
+```
+euler = kArrayNav( [10,20,30] ).to_rad()
+q4    = euler.euler2Q()
+q_inv = q4.q_inv()
+e2    = q_inv.Q2euler().to_deg()
+```
+
+### derivative:
+```
+dqdt = qi2b.dqdt( w_ib_b )
+```
+
+### conjugate:
+
+```python
+q  = ...
+qj = q.q_conj()
+```
+
+### transform a vector with quaternions:
+```python
+q_a2b = ...
+vector_resolved_in_a = kArrayNav( [1,2,3], hvector=False )
+vector_resolved_in_b = q_a2b.q_x_3d(vector_resolved_in_a)
+```
 
 # How to test it
 ```
