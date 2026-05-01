@@ -335,7 +335,7 @@ class TestClass_kArrayNav:
             R = euler.euler2C()
 
             q = euler.euler2Q()
-            q_inv = q.Qinv()
+            q_inv = q.q_inv()
 
             euler_from_q_inv = q_inv.Q2euler().to_deg()
             euler_from_R_inv = R.T.C2euler().to_deg()
