@@ -218,9 +218,10 @@ class kNavTransformations(kNavLib):
         """
         return self.__class__( self.C2euler().euler2Q() )
 
-    def Qinv(self):
+    def q_inv(self):
         """
-        Calculates the inverse of a quaternion. This is similar to inverting a transformation matrix.
+        Calculates the inverse of a quaternion. This is similar to inverting a
+        transformation matrix.
         """
         shape = self.shape
         tmp   = self.squeeze().tolist()
