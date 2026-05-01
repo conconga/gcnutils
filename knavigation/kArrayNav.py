@@ -264,6 +264,29 @@ class kNavTransformations(kNavLib):
 
         return self.__class__( q3, hvector=False )
 
+    def _q1_x_q2(self, q2):
+        """
+        Same as q1_x_q2(), but calculate with another equation, more theoretical.
+
+        q = [s v^T]^T
+
+        """
+        # assumption: q = [real, imag^T]^T
+        q1 = self.squeeze()
+        q2 = q2.squeeze()
+
+        s1 = q1[0]
+        v1 = q1[1:].view(np.ndarray)
+
+        s2 = q2[0]
+        v2 = q2[1:].view(np.ndarray)
+
+        # q1 x q2:
+        s3 = (s1*s2) - (v1.dot(v2))
+        v3 = (s1*v2) + (s2*v1) + np.cross(v1,v2)
+
+        return self.__class__( np.hstack( (s3,v3) ), hvector=False )
+
     def q_x_3d(self, vector):
         """
         Resolves a vector in another frame.
