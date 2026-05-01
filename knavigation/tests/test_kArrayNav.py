@@ -98,35 +98,72 @@ class TestClass_kArrayNav:
             assert abs(norm2_v1 - norm2_v2) < 1e-10
             assert v1 == v2
     
+    def test_q_x_q_against_vector3D(self):
+        vector = kArrayNav( [1,-2,3], hvector=False )
+        for _ in range(30):
+            euler_a2b = kArrayNav( self.get_random_euler_rad() )
+            euler_b2c = kArrayNav( self.get_random_euler_rad() )
+
+            q_a2b = euler_a2b.euler2Q()
+            q_b2c = euler_b2c.euler2Q()
+
+            # ground truth:
+            if np.random.rand() > 0.5:
+                vc_1 = euler_b2c.euler2C() * euler_a2b.euler2C() * vector
+            else:
+                vc_1 = q_b2c.Q2C() * q_a2b.Q2C() * vector
+
+            # with two consecutive transformations:
+            vc_2 = q_b2c.q_x_3d( q_a2b.q_x_3d(vector) )
+
+            # now cascading the quaternions:
+            vc_3 = q_a2b.q_x_q(q_b2c).q_x_3d(vector)
+
+            # verifying the norm of the vectors:
+            norm2_v1 = sum([i**2 for i in vc_1])
+            norm2_v2 = sum([i**2 for i in vc_2])
+            norm2_v3 = sum([i**2 for i in vc_3])
+
+            assert abs(norm2_v1 - norm2_v2) < 1e-10
+            assert abs(norm2_v1 - norm2_v3) < 1e-10
+
+            # comparing the components in the vectors:
+            for i,j in zip(vc_1, vc_2):
+                assert abs(i-j) < 1e-10
+
+            for i,j in zip(vc_1, vc_3):
+                assert abs(i-j) < 1e-10
+
+    def test_q_x_q_tests_against_C(self):
         for _ in range(50):
-            euler_rad = kArrayNav( self.get_random_euler_rad() )
-            Ca2b = kArrayNav( euler_rad ).euler2C()
-            qa2b = kArrayNav( euler_rad ).euler2Q()
+            euler_a2b = kArrayNav( self.get_random_euler_rad() )
+            Ca2b      = kArrayNav( euler_a2b ).euler2C()
+            qa2b      = kArrayNav( euler_a2b ).euler2Q()
 
-            euler_rad = kArrayNav( self.get_random_euler_rad() )
-            Cb2c = kArrayNav( euler_rad ).euler2C()
-            qb2c = kArrayNav( euler_rad ).euler2Q()
+            euler_b2c = kArrayNav( self.get_random_euler_rad() )
+            Cb2c      = kArrayNav( euler_b2c ).euler2C()
+            qb2c      = kArrayNav( euler_b2c ).euler2Q()
 
-            Ca2c = Cb2c * Ca2b
-            qa2c = qb2c.q1_x_q2(qa2b)
-            #qa2c = qa2b.q1_x_q2(qb2c)
+            Ca2c = Cb2c * Ca2b       # <= truth
+            qa2c = qa2b.q_x_q(qb2c)  # <= test
+
             C    = qa2c.Q2C()
 
             for j,k in zip(Ca2c, C):
                 assert abs(j-k) < 1e-10
 
-    def test_q1_x_q2_tests_on_euler(self):
+    def test_q_x_q_tests_against_euler(self):
         for _ in range(50):
-            euler_rad = kArrayNav( self.get_random_euler_rad() )
-            Ca2b = kArrayNav( euler_rad ).euler2C()
-            qa2b = kArrayNav( euler_rad ).euler2Q()
+            euler_a2b = kArrayNav( self.get_random_euler_rad() )
+            Ca2b = kArrayNav( euler_a2b ).euler2C()
+            qa2b = kArrayNav( euler_a2b ).euler2Q()
 
-            euler_rad = kArrayNav( self.get_random_euler_rad() )
-            Cb2c = kArrayNav( euler_rad ).euler2C()
-            qb2c = kArrayNav( euler_rad ).euler2Q()
+            euler_b2c = kArrayNav( self.get_random_euler_rad() )
+            Cb2c = kArrayNav( euler_b2c ).euler2C()
+            qb2c = kArrayNav( euler_b2c ).euler2Q()
 
             Ca2c = Cb2c * Ca2b
-            qa2c = qb2c.q1_x_q2(qa2b)
+            qa2c = qa2b.q_x_q(qb2c)
 
             euler   = Ca2c.C2euler()
             euler_t = qa2c.Q2euler()
@@ -135,7 +172,7 @@ class TestClass_kArrayNav:
                 assert abs(j-k) < 1e-10
 
 
-    def test_q1_x_q2_tests_on_q(self):
+    def test_q_x_q_calculated_in_two_ways(self):
         for _ in range(50):
             euler_rad = kArrayNav( self.get_random_euler_rad() )
             qa2b = kArrayNav( euler_rad).euler2Q()
@@ -143,8 +180,8 @@ class TestClass_kArrayNav:
             euler_rad = kArrayNav( self.get_random_euler_rad() )
             qb2c = kArrayNav( euler_rad ).euler2Q()
 
-            qa2c = qb2c.q1_x_q2(qa2b)
-            qnew = qb2c._q1_x_q2(qa2b)
+            qa2c = qa2b.q_x_q(qb2c)
+            qnew = qa2b._q_x_q(qb2c)
 
             for i,j in zip(qa2c, qnew):
                 assert (i-j) < 1e-10

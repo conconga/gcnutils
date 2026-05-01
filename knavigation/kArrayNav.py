@@ -237,17 +237,23 @@ class kNavTransformations(kNavLib):
         #return self.__class__( np.hstack(([self[0]] + [-i for i in self[1:]])), hvector=False )
         return self.__class__( [-i if idx >= 1 else i for idx,i in enumerate(self) ], hvector=False )
 
-    def q1_x_q2(self, q2):
+    def q_x_q(self, q2):
         """
         Navigation -- multiplies two quaternions
         (Titterton (3.55)-(3.56))
 
-        Let q1 represent C_a2b, and q2 represent C_b2c.
-        The product C_a2c = C_b2c.C_a2b might be represented
-        by q_a2c = q_b2c.q_a2b
+        **Remark** Here there are some hints on how to cascade quaternions for multiple
+        transformations. See the respective test-units for details on the implementation.
+
+            euler_a2b  -->  Ca2b | qa2b
+            euler_b2c  -->  Cb2c | qb2c
+
+            Ca2c = Cb2c * Ca2b
+            qa2c = qa2b o qb2c  <== where 'o' is the product `q_x_q()`.
 
         output: np.array quaternion q3=q1.q2
         """
+
         q1 = self.squeeze()
         assert len(q1) == 4
 
@@ -264,9 +270,9 @@ class kNavTransformations(kNavLib):
 
         return self.__class__( q3, hvector=False )
 
-    def _q1_x_q2(self, q2):
+    def _q_x_q(self, q2):
         """
-        Same as q1_x_q2(), but calculate with another equation, more theoretical.
+        Same as q_x_q(), but calculate with another equation, more theoretical.
 
         q = [s v^T]^T
 
@@ -293,14 +299,16 @@ class kNavTransformations(kNavLib):
         This is similar to Ca2b x vector, but directly using quaternions.
         (Titterton (3.57))
 
-        The operation performed here is this:
-        r2 = q . r1 . q*
-        where r1 and r2 are vectors in quaternion-form (real part = 0), but
-        with the inverse of `q`.
+        **Remark** Note that Titterton's equation matches his convention of
+        creating quaternions using euler angles from frames a^ to b^, but
+        performing transformations from b^ to a^.
 
-        With some algebra, the result above is the same as the operating the
-        transformation backwards, or using the transpose of `Q2C()`. See the
-        **remark** in the docstring of `Q2C()`.
+        Here we provide an operation that uses a quaternion from a^ to b^ and
+        a vector transformation also from a^ to b^. Hence:
+        rb = q_a2b*  o  ra  o  q_a2b
+
+        The vectors rb and ra are quaternion-form vectors (real-part = 0),
+        but this is not important for inputs and output, which are 3D only.
 
         Inputs:
             Q4 (a + b.i + c.j + d.k)  :  quaternions
@@ -311,7 +319,10 @@ class kNavTransformations(kNavLib):
 
         """
 
-        q = self.q_inv().squeeze() # <== first, use the inverse
+        # To be complete, we shall include the next line to invert the
+        # quaternion and have the correct input for the transformation without
+        # the C matrix.
+        q = self.q_inv().squeeze() # <== first, use the inverse; see comments in the docstring
         v = vector.squeeze()
 
         # checks:
@@ -325,7 +336,7 @@ class kNavTransformations(kNavLib):
         q_j = q.q_conj()
 
         # transformed vector (without the real part):
-        ret = self.__class__(q).q1_x_q2(v).q1_x_q2(q_j)[1:] # <= to remove the real part
+        ret = self.__class__(q).q_x_q(v).q_x_q(q_j)[1:] # <= to remove the real part
 
         return ret
 
