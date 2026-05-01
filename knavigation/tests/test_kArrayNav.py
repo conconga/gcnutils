@@ -52,30 +52,36 @@ class TestClass_kArrayNav:
             a = kArrayNav([1,2,3,4]).Q2euler()
 
     def test_Q2C(self):
-        print("==== Q2C ====")
         for i in range(50):
             euler_rad = kArrayNav( self.get_random_euler_rad() )
+
+            # euler -> q -> C1,C2
+            #      \\> C3
 
             q  = euler_rad.euler2Q()
             C1 = q.Q2C()
             C2 = q._Q2C()
+            C3 = euler_rad.euler2C()
 
-            for j,k in zip(C1, C2):
+            for j,k,u in zip(C1, C2, C3):
                 assert abs(j-k) < 1e-10
+                assert abs(j-u) < 1e-10
 
     def test_Q2C_C2Q(self):
-        print("==== Q2C / C2Q ====")
         for _ in range(20):
+
+            # euler -> q -> C -> euler -> q
+
             euler = kArrayNav( self.get_random_euler_rad() )
-            q4    = euler.euler2Q()
-            C     = q4.Q2C()
+            q     = euler.euler2Q()
+            C     = q.Q2C()
             euler_t = C.C2euler()
-            q4_t  = C.C2Q()
+            q_t  = C.C2Q()
 
             for j,k in zip(euler, euler_t):
                 assert abs(j-k) < 1e-10
 
-            for j,k in zip(q4, q4_t):
+            for j,k in zip(q, q_t):
                 assert abs(j-k) < 1e-10
 
     def test_q_x_3d(self):
