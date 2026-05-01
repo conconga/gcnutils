@@ -49,10 +49,45 @@ c = a.to_skew() * b # alternative
 ```
 
 ## to convert to/from euler angles from/to quaternions:
-```
+
+```python
 euler = kArrayNav( [10,20,30] ).to_rad()
 q4    = euler2Q()
 euler = q4.Q2euler()
+```
+
+### how to understand the relationship between euler-angles, quaternions and transformation matrices
+
+**Disclaimer** Although referred to as *Euler* angles as commonly used by the
+aeronautic aerospace literature, we should rename it to *Tait-Bryan* angles. I
+acknowledge here that the difference is known, the usage is wrong, but I move
+on with the deviation to mitigate confusion.
+
+Given three angles that describe the relationship between two reference frames,
+say frames a^ and b^, the classes in this package are build to, from the euler
+angles, provide quaternions and transf. matrices to resolve a vector also from
+a^ to b^. That is:
+
+```verbatim
+            +-->  C_a2b
+          <-+      ^
+euler_a2b          |
+          <-+      v
+            +-->  q_a2b
+```
+
+in a way that:
+```python
+euler_n2b = kArrayNav([phi, theta, psi]) # [rad]
+C_n2b     = euler_n2b.euler2C()
+q_n2b     = euler_n2b.euler2Q()
+
+vector_n  = kArrayNav([vx, vy, vz], hvector=False)
+
+# either:
+vector_n  = C_n2b * vector_n
+# or:
+vector_n  = q_n2b.q_x_3d(vector_n)
 ```
 
 ## to convert to/from quaternions from/to transformation-matrix:
