@@ -157,8 +157,14 @@ class kQuatNav:
         """
         The derivative of the quaternions is $\\dot{q} = 1/2 .B(w).q$
         This funtion returns $\\dot{q}$.
-        : input  : q4
-        : output : d(q4)dt
+
+        Inputs:
+            Q4 (a + b.i + c.j + d.k)  :  quaternions
+            w_ib_b                    :  [rad/s] angular velocity
+                
+        Returns:
+            d(q4)dt
+
         """
 
         assert len(self.squeeze()) == 4

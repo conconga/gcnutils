@@ -209,6 +209,41 @@ class TestClass_kArrayNav:
                 #print("{:f} == {:f} ?".format(i,j))
                 assert abs(i-j) < 1e-3
 
+    @pytest.mark.parametrize(
+            "w_ib_b, euler_1s, idx", [
+                ( [20, 0, 0], [19.9, 0, 0], 0 ),
+                ( [0, -20, 0], [0, -19.9, 0], 1 ),
+                ( [0, 0, 5], [0, 0, 4.9], 2 ),
+    ])
+    def test_dqdt_signals(self, w_ib_b, euler_1s, idx):
+        import scipy.integrate  as Int
+
+        #  I: inertial frame
+        #  b: body frame
+        qI2b = kArrayNav( [0,0,0] ).euler2Q()
+
+        # angular rotation between I and b:
+        w_ib_b = kArrayNav( w_ib_b, hvector=False ).to_rad()
+
+        def eqdiff(q,t,w_ib_b):
+            """
+            we will use scipy to call this function, and therefore q shall be a list().
+            """
+            qi2b = kArrayNav(q)
+            dqdt = qi2b.dqdt( w_ib_b )
+            return dqdt.to_list()
+
+        T = np.linspace(0,1,20)
+        y = Int.odeint(eqdiff, qI2b.to_list(), T, (w_ib_b,))[-1]
+
+        # from the quaternions to euler, to compare:
+        euler = kArrayNav(y, hvector=False).Q2euler().to_deg()
+
+        if euler_1s[idx] > 0:
+            assert euler_1s[idx] < euler[0][idx] < (euler_1s[idx] + 0.2)
+        else:
+            assert euler_1s[idx] > euler[0][idx] > (euler_1s[idx] - 0.2)
+
     def test_dynamics(self):
         #----------------------#
         # some dynamic tests:
