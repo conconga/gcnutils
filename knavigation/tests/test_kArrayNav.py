@@ -192,6 +192,14 @@ class TestClass_kArrayNav:
             for i,j in zip(e1,e2):
                 assert (i-j) < 1e-10
 
+    def test_qq_1(self):
+        for _ in range(100):
+            euler_rad = kArrayNav( self.get_random_euler_rad() )
+            q  = euler_rad.euler2Q()
+            qj = q.conj()
+
+            assert (1-1e-9) < q.T * qj < (1+1e-9)
+
     def test_Re2n(self):
         print("==== Re2n ====")
         Re2n = kArrayNav().Re2n(0,0)
