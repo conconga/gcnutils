@@ -24,7 +24,7 @@ class kCommon2OrderLTIsysMimo:
 
     def __init__(self, qsi, wn, x0, min_dxdt, max_dxdt, min_x, max_x, Ts=0):
         """
-        \parameters:
+        parameters:
             qsi : damping factor
             wn  : [rad/s] natural freq.
             x0  : initial state

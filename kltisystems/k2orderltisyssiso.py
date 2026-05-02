@@ -23,7 +23,7 @@ from   scipy.integrate import odeint
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 class kCommon2OrderLTIsysSiso:
     """
-    \parameters:                     
+    parameters:                     
         qsi : damping factor        
         wn  : [rad/s] natural freq.
         x0  : initial state       

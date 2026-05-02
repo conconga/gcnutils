@@ -39,7 +39,7 @@ class kNOrderDerivativeSiso:
     """
     This objects smoothes the input signal and calculates its derivatives.
 
-    \parameters:                     
+    parameters:                     
         order    : maximum order of the derivative to estimate; eg. y''' => order=3
         pole     : poles of the system, negative floats
         Ts       : discrete interval
