@@ -192,13 +192,30 @@ class TestClass_kArrayNav:
             for i,j in zip(e1,e2):
                 assert (i-j) < 1e-10
 
-    def test_qq_1(self):
+    def test_q_x_q1(self):
         for _ in range(100):
             euler_rad = kArrayNav( self.get_random_euler_rad() )
             q  = euler_rad.euler2Q()
-            qj = q.conj()
 
-            assert (1-1e-9) < q.T * qj < (1+1e-9)
+            if np.random.rand() > 0.5:
+                qj = q.q_conj() # it works only for quaternions of transformation
+            else:
+                qj = q.q_inv()
+
+            prod1 = q.q_x_q(qj)
+            prod2 = qj.q_x_q(q)
+            ret_expected = kArrayNav([1,0,0,0], hvector=False)
+
+            #print(f"expected == {prod1}   ==>  {ret_expected == prod1}")
+            #print(f"expected == {prod2}   ==>  {ret_expected == prod2}")
+
+            for i in range(4):
+                if i == 0:
+                    assert abs(prod1.squeeze()[i] - 1.0) < 1e-10
+                    assert abs(prod2.squeeze()[i] - 1.0) < 1e-10
+                else:
+                    assert abs(prod1.squeeze()[i]) < 1e-10
+                    assert abs(prod2.squeeze()[i]) < 1e-10
 
     def test_Re2n(self):
         print("==== Re2n ====")
