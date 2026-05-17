@@ -19,7 +19,7 @@ import scipy.integrate    as Int
 ###################################
 ## First Order Continuous System ##
 ###################################
-class k1OrderLTIsysSisoContinuous
+class k1OrderLTIsysSisoContinuous:
 
     def __init__(self, a, y0):
         """
@@ -87,8 +87,8 @@ def fn_example():
     tmax = 2.0
     Ts   = 5e-3 # sample rate
     T    = [i*Ts for i in range(int(tmax/Ts)+1)] # time vector
-    f1c  = CF1ORD_C(a, 0)
-    f1d  = CF1ORD_D(a, Ts, 1)
+    f1c  = k1OrderLTIsysSisoContinuous(a, 0)
+    f1d  = k1OrderLTIsysSisoDiscrete(a, Ts, 1)
 
     log_x  = list()
     log_yc = list()
