@@ -23,21 +23,21 @@ class k1OrderLTIsysSisoContinuous:
     """
     The system is the differential implementation of:
 
-    f(t) = x + (y0 - x).exp(a.t)
+    f(t) = x + (y0 - x).exp(pole.t)
     """
 
-    def __init__(self, a, y0):
+    def __init__(self, pole, y0):
         """
-        T(s) = -a/(s-a)
+        T(s) = -pole/(s-pole)
 
         Inputs:
-            a    :   pole ( pole<0 for estability )
+            pole :   system pole ( Re{pole}<0 for estability )
             y0   :   initial condition
         """
 
-        self.a = a
-        self.y = y0
-        self.t = 0.
+        self.pole = pole
+        self.y    = y0
+        self.t    = 0.
 
     def _dydt(self, y, t, x_):
         """
@@ -45,7 +45,7 @@ class k1OrderLTIsysSisoContinuous:
         """
 
         x = x_
-        return self.a*(y-x)
+        return self.pole*(y-x)
 
     def update(self, t, x):
         y = Int.odeint(self._dydt, self.y, [self.t, t], (x,)) # returns y[t-1] e y[t]
