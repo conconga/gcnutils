@@ -39,16 +39,16 @@ class k1OrderLTIsysSisoContinuous:
         self.y = y0
         self.t = 0.
 
-    def dydt(self, y, t, x_):
+    def _dydt(self, y, t, x_):
         """
-        dydt(t) = a.y(t) - a.x(t)
+        _dydt(t) = a.y(t) - a.x(t)
         """
 
         x = x_
         return self.a*(y-x)
 
     def update(self, t, x):
-        y = Int.odeint(self.dydt, self.y, [self.t, t], (x,)) # returns y[t-1] e y[t]
+        y = Int.odeint(self._dydt, self.y, [self.t, t], (x,)) # returns y[t-1] e y[t]
         self.y = y[1]
         self.t = t
 
