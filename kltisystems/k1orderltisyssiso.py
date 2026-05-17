@@ -20,10 +20,19 @@ import scipy.integrate    as Int
 ## First Order Continuous System ##
 ###################################
 class k1OrderLTIsysSisoContinuous:
+    """
+    The system is the differential implementation of:
+
+    f(t) = x + (y0 - x).exp(a.t)
+    """
 
     def __init__(self, a, y0):
         """
         T(s) = -a/(s-a)
+
+        Inputs:
+            a    :   pole ( pole<0 for estability )
+            y0   :   initial condition
         """
 
         self.a = a
@@ -43,9 +52,7 @@ class k1OrderLTIsysSisoContinuous:
         self.y = y[1]
         self.t = t
 
-    def y(self):
         return self.y
-
 
 #################################
 ## First Order Discrete System ##
@@ -63,20 +70,19 @@ class k1OrderLTIsysSisoDiscrete:
 
         k = 2.-(a*Ts)
 
-        self.b = -a*Ts/k
-        self.c = (2.+(a*Ts))/k
-        self.y = y0
-        self.x = 0.
-        self.t = 0.
+        self.b  = -a*Ts/k
+        self.c  = (2.+(a*Ts))/k
+        self.y  = y0
+        self.x  = 0.
+        self.t  = 0.
+        self.Ts = Ts
 
-    def update(self, t, x):
+    def update(self, x):
         self.y = (self.b*x) + (self.b*self.x) + (self.c*self.y)
-        self.t = t
+        self.t += self.Ts
         self.x = x
 
-    def y(self):
         return self.y
-
 
 #################################
 def fn_example():
@@ -98,7 +104,7 @@ def fn_example():
             x = float(np.random.rand()) # plant input
 
         f1c.update(t, x)
-        f1d.update(t, x)
+        f1d.update(x)
         log_x.append(x)
         log_yc.append(f1c.y)
         log_yd.append(f1d.y)
