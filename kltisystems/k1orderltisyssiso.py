@@ -49,7 +49,7 @@ class k1OrderLTIsysSisoContinuous:
 
     def update(self, t, x):
         y = Int.odeint(self._dydt, self.y, [self.t, t], (x,)) # returns y[t-1] e y[t]
-        self.y = y[1]
+        self.y = y.reshape(-1)[1]
         self.t = t
 
         return self.y
@@ -130,3 +130,7 @@ def fn_example():
     #.............................................#
     plt.show(block=False)
     #.............................................#
+
+#################################
+if __name__ == "__main__":
+    fn_example()
