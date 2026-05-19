@@ -8,34 +8,38 @@
     - [<span class="toc-section-number">2.1.2</span> Discrete
       Time](#discrete-time)
   - [<span class="toc-section-number">2.2</span>
+    k1OrderLTIsysMimo](#k1orderltisysmimo)
+    - [<span class="toc-section-number">2.2.1</span> Discrete
+      Time](#discrete-time-1)
+  - [<span class="toc-section-number">2.3</span>
     k2OrderLTIsysSiso](#k2orderltisyssiso)
-    - [<span class="toc-section-number">2.2.1</span> to create a SISO
+    - [<span class="toc-section-number">2.3.1</span> to create a SISO
       continuous 2-order LTI
       system:](#to-create-a-siso-continuous-2-order-lti-system)
-    - [<span class="toc-section-number">2.2.2</span> to create a SISO
+    - [<span class="toc-section-number">2.3.2</span> to create a SISO
       discrete 2-order LTI
       system:](#to-create-a-siso-discrete-2-order-lti-system)
-    - [<span class="toc-section-number">2.2.3</span> to update the
+    - [<span class="toc-section-number">2.3.3</span> to update the
       systems:](#to-update-the-systems)
-    - [<span class="toc-section-number">2.2.4</span> to get the current
+    - [<span class="toc-section-number">2.3.4</span> to get the current
       state:](#to-get-the-current-state)
-  - [<span class="toc-section-number">2.3</span>
+  - [<span class="toc-section-number">2.4</span>
     k2OrderLTIsysMimo](#k2orderltisysmimo)
-    - [<span class="toc-section-number">2.3.1</span> to create a MIMO
+    - [<span class="toc-section-number">2.4.1</span> to create a MIMO
       continuous 2-order LTI
       system:](#to-create-a-mimo-continuous-2-order-lti-system)
-    - [<span class="toc-section-number">2.3.2</span> to create a MIMO
+    - [<span class="toc-section-number">2.4.2</span> to create a MIMO
       discrete 2-order LTI
       system:](#to-create-a-mimo-discrete-2-order-lti-system)
-    - [<span class="toc-section-number">2.3.3</span> to update the
+    - [<span class="toc-section-number">2.4.3</span> to update the
       systems:](#to-update-the-systems-1)
-    - [<span class="toc-section-number">2.3.4</span> to get the current
+    - [<span class="toc-section-number">2.4.4</span> to get the current
       state:](#to-get-the-current-state-1)
-  - [<span class="toc-section-number">2.4</span>
+  - [<span class="toc-section-number">2.5</span>
     kNOrderDerivativeSiso](#knorderderivativesiso)
-    - [<span class="toc-section-number">2.4.1</span> to create a system
+    - [<span class="toc-section-number">2.5.1</span> to create a system
       (filter):](#to-create-a-system-filter)
-    - [<span class="toc-section-number">2.4.2</span> to update the
+    - [<span class="toc-section-number">2.5.2</span> to update the
       inputs and get new
       outputs:](#to-update-the-inputs-and-get-new-outputs)
 - [<span class="toc-section-number">3</span> How to use](#how-to-use)
@@ -82,13 +86,32 @@ derivative of any order fo the input signal.
     pole = -2.0
     y0   =  3.0
     Ts   =  1e-3 # <= sampling time, in [s]
-    f1d = k1OrderLTIsysSisoContinuous(pole, Ts, y0)
+    f1d = k1OrderLTIsysSisoDiscrete(pole, Ts, y0)
 ```
 
 #### to integrate up to the next time step:
 ```python
     x = 10. # <= input
-    y = f1c.update(x) # <= from [k-1] to [k]
+    y = f1d.update(x) # <= from [k-1] to [k]
+```
+
+## k1OrderLTIsysMimo
+
+### Discrete Time
+
+#### to create a MIMO discrete 1st-order LTI system:
+```python
+    pole = -2.0
+    y0   = [1,2,3] # <= initial state, and size of the filter
+    Ts   = 1e-1    # [s] sampling period
+
+    f1d  = k1OrderLTIsysMimo(pole, Ts, y0)
+```
+
+#### to integrate up to the next time step:
+```python
+    x = [3, 4, 5]     # <= inputs
+    y = f1d.update(x) # <= from [k-1] to [k]
 ```
 
 ## k2OrderLTIsysSiso
