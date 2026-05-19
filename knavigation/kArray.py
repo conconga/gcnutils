@@ -205,9 +205,15 @@ class kArray (kArrayCommon, kArrayLib, np.ndarray):
 
         return ret
 
+    # y * self:
     def __rmul__(self, y):
         # if y were a matrix, then __mul__() would be called by the matrix.
-        return self * y
+        # When y is ndarray(), it triggers this method from kArray instead of ndarray.__mul__().
+        if isinstance(y, (int, float)):
+            return self * y
+            # return y * self <= recursive calls to here
+        else:
+            return self.__class__(y) * self
 
     #( --- iter --- )#
     def __iter__(self):

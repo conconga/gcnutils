@@ -162,6 +162,12 @@ class TestClass_kArray:
         assert a == kArray([10,20,30])
         print("a *= 10 : {:f}".format(a))
 
+    def test_ndarray_x_kArray(self):
+        A = np.eye(4)
+        B = kArray([[1,2,3,4], [5,6,7,8]], hvector = False).T # [4x2]
+        C = A * B
+        assert B == C
+
     #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
     def test_matrix_init(self):
         print("==== __init__() ====")
