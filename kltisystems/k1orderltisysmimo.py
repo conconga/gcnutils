@@ -64,7 +64,7 @@ class k1OrderLTIsysMimoDiscrete:
         if isinstance(x, (list, tuple)):
             y = [ self.filters[i].update(x[i]) for i in range(self.N) ]
         else:
-            x = x.reshape(-1)
+            x = x.squeeze()
             y = [ self.filters[i].update(x[i]) for i in range(self.N) ]
 
         if isinstance(x, np.ndarray):
