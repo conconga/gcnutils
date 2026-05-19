@@ -85,7 +85,7 @@ class k1OrderLTIsysSisoDiscrete:
         return self.y
 
 #################################
-def fn_example():
+def fn_example_siso():
 
     import matplotlib.pyplot      as plt
 
@@ -133,4 +133,4 @@ def fn_example():
 
 #################################
 if __name__ == "__main__":
-    fn_example()
+    fn_example_siso()

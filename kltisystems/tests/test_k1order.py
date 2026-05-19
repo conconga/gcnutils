@@ -6,7 +6,9 @@ print(f"** __package__ = {__package__}")
 print(f"** sys.path[0] = {sys.path[0]}")
 
 from kltisystems import k1OrderLTIsysSisoContinuous, k1OrderLTIsysSisoDiscrete
-from kltisystems import fn_example
+from kltisystems import k1OrderLTIsysMimoDiscrete
+from kltisystems import fn_example_siso, fn_example_mimo
+from knavigation import kArray
 from math        import exp
 import numpy as np
 #import math
@@ -20,8 +22,11 @@ import numpy as np
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 class TestClass_Example:
 
-    def test_example(self):
-        fn_example()
+    def test_example_siso(self):
+        fn_example_siso()
+
+    def test_example_mimo(self):
+        fn_example_mimo()
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 #>>                                                      >>
@@ -59,5 +64,52 @@ class TestClass_1OrderDiscrete:
             y = f1d.update(1.0)
             #print(f"y = {y};    sol = {fn_solution(y0, 1.0, pole, t)}")
             assert abs(y - fn_solution(y0, 1.0, pole, t)) < 1e-6
+
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
+#>>                                                      >>
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
+class TestClass_1OrderDiscreteMimo:
+
+    def test_decay(self):
+        pole = -2.0
+        y0   = [3.0, 5.0]
+        Ts   = 1./1e6 # [s]
+
+        f1d = k1OrderLTIsysMimoDiscrete(pole, Ts, y0)
+
+        for t in np.arange(Ts, 0.5, Ts):
+            y = f1d.update([0,0])
+
+            #print(f"y = {y};    sol = {fn_solution(y0, 1.0, pole, t)}")
+            for i in range(2):
+                assert abs(y[i] - fn_solution(y0[i], 0.0, pole, t)) < 1e-6
+
+    def test_input_nparray(self):
+        pole = -2.0
+        y0   = [3.0, 5.0]
+        Ts   = 1./1e3 # [s]
+
+        f1d = k1OrderLTIsysMimoDiscrete(pole, Ts, y0)
+
+        for t in np.arange(Ts, 1.0, Ts):
+            y = f1d.update(np.asarray([0,0]))
+
+            #print(f"y = {y};    sol = {fn_solution(y0, 1.0, pole, t)}")
+            for i in range(2):
+                assert abs(y[i] - fn_solution(y0[i], 0.0, pole, t)) < 1e-6
+
+    def test_input_karray(self):
+        pole = -2.0
+        y0   = [3.0, 5.0]
+        Ts   = 1./1e3 # [s]
+
+        f1d = k1OrderLTIsysMimoDiscrete(pole, Ts, y0)
+
+        for t in np.arange(Ts, 1.0, Ts):
+            y = f1d.update(kArray([0,0], hvector=False))
+
+            #print(f"y = {y};    sol = {fn_solution(y0, 1.0, pole, t)}")
+            for i in range(2):
+                assert abs(y[i] - fn_solution(y0[i], 0.0, pole, t)) < 1e-6
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
