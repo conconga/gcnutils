@@ -39,6 +39,16 @@ class TestClass_kArrayNav:
             else:
                 assert abs(q[i] + qj[i]) < 1e-10
 
+    def test_quat_norm(self):
+        for i in range(20):
+            euler   = kArrayNav( self.get_random_euler_rad() )
+            q4      = euler.euler2Q() # <= this is normalized
+            scale   = np.random.randint(2,20)
+            q_scale = q4 * scale
+            q_norm  = q4.q_norm()
+            for j,k in zip(q4, q_norm):
+                assert abs(j-k) < 1e-10
+
     def test_euler_Q_euler(self):
         for i in range(20):
             euler   = kArrayNav( self.get_random_euler_rad() )

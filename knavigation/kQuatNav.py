@@ -49,6 +49,12 @@ class kQuatNav:
         #return self.__class__( np.hstack(([self[0]] + [-i for i in self[1:]])), hvector=False )
         return self.__class__( [-i if idx >= 1 else i for idx,i in enumerate(self) ], hvector=False )
 
+    def q_norm(self):
+        """
+        Normalizes the given quaternion.
+        """
+        return self.__class__( self / sum( [i**2 for i in self] ))
+
     def q_x_q(self, q2):
         """
         Navigation -- multiplies two quaternions

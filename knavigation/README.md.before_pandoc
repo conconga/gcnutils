@@ -182,6 +182,12 @@ q  = ...
 qj = q.q_conj()
 ```
 
+### normalization:
+```python
+q = ...
+q_normalized = q.q_norm()
+```
+
 ### transform a vector with quaternions:
 ```python
 q_a2b = ...

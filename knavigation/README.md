@@ -52,7 +52,9 @@
       derivative:](#derivative)
     - [<span class="toc-section-number">2.16.4</span>
       conjugate:](#conjugate)
-    - [<span class="toc-section-number">2.16.5</span> transform a vector
+    - [<span class="toc-section-number">2.16.5</span>
+      normalization:](#normalization)
+    - [<span class="toc-section-number">2.16.6</span> transform a vector
       with quaternions:](#transform-a-vector-with-quaternions)
 - [<span class="toc-section-number">3</span> How to test
   it](#how-to-test-it)
@@ -239,6 +241,12 @@ dqdt = qi2b.dqdt( w_ib_b )
 ```python
 q  = ...
 qj = q.q_conj()
+```
+
+### normalization:
+```python
+q = ...
+q_normalized = q.q_norm()
 ```
 
 ### transform a vector with quaternions:
