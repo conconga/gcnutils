@@ -61,7 +61,11 @@ class k1OrderLTIsysMimoDiscrete:
             x    :  (vector) [N x 1] inputs
         """
 
-        y = [ self.filters[i].update(x[i]) for i in range(self.N) ]
+        if isinstance(x, (list, tuple)):
+            y = [ self.filters[i].update(x[i]) for i in range(self.N) ]
+        else:
+            x = x.reshape(-1)
+            y = [ self.filters[i].update(x[i]) for i in range(self.N) ]
 
         if isinstance(x, np.ndarray):
             self.y = np.asarray(y)
