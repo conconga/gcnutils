@@ -53,7 +53,7 @@ class kQuatNav:
         """
         Normalizes the given quaternion.
         """
-        return self.__class__( self / sum( [i**2 for i in self] ))
+        return self.__class__( self / np.sqrt(sum( [i**2 for i in self] )))
 
     def q_x_q(self, q2):
         """
