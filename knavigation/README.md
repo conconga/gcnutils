@@ -54,7 +54,9 @@
       conjugate:](#conjugate)
     - [<span class="toc-section-number">2.16.5</span>
       normalization:](#normalization)
-    - [<span class="toc-section-number">2.16.6</span> transform a vector
+    - [<span class="toc-section-number">2.16.6</span> M+ and
+      M-:](#m-and-m-)
+    - [<span class="toc-section-number">2.16.7</span> transform a vector
       with quaternions:](#transform-a-vector-with-quaternions)
 - [<span class="toc-section-number">3</span> How to test
   it](#how-to-test-it)
@@ -247,6 +249,15 @@ qj = q.q_conj()
 ```python
 q = ...
 q_normalized = q.q_norm()
+```
+
+### M+ and M-:
+This is to convert multiplication of quaternions to product of matrices.
+```python
+# q1 o q2  =  M+ . q2
+Mplus = q1.to_Mplus()
+# q1 o q2  =  M- . q1
+Mminus = q2.to_Mminus()
 ```
 
 ### transform a vector with quaternions:

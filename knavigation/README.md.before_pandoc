@@ -188,6 +188,15 @@ q = ...
 q_normalized = q.q_norm()
 ```
 
+### M+ and M-:
+This is to convert multiplication of quaternions to product of matrices.
+```python
+# q1 o q2  =  M+ . q2
+Mplus = q1.to_Mplus()
+# q1 o q2  =  M- . q1
+Mminus = q2.to_Mminus()
+```
+
 ### transform a vector with quaternions:
 ```python
 q_a2b = ...
