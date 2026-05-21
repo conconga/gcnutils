@@ -166,7 +166,10 @@ class kQuatNav:
 
         Inputs:
             Q4 (a + b.i + c.j + d.k)  :  quaternions
-            w_ib_b                    :  [rad/s] angular velocity
+            w                         :  [rad/s] angular velocity
+
+        Example:
+            q_a2b.dqdt(w_ab_b)
                 
         Returns:
             d(q4)dt
