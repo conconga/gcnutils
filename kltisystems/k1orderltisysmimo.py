@@ -37,7 +37,7 @@ class k1OrderLTIsysMimoDiscrete:
     f(t) = x + (y0 - x).exp(pole.t)
 
     where:
-        pole :  (float) pole < 0 for stability
+        pole :  (float) or ([N x 1]) pole < 0 for stability
         x    :  (vector) [N x 1] inputs
         y    :  (vector) [N x 1] outputs
         y0   :  (vector) [N x 1] initial condition
@@ -47,13 +47,19 @@ class k1OrderLTIsysMimoDiscrete:
     def __init__(self, pole, Ts, y0):
         """
         Inputs:
-            pole :  (float) pole < 0 for stability
+            pole :  (float) or ([N x 1]) pole < 0 for stability
             y0   :  (vector) [N x 1] initial condition
             Ts   :  (float)  [s] sampling period
         """
 
         self.N = len(y0) if isinstance(y0, (list, tuple)) else len(y0.squeeze())
-        self.filters = [k1OrderLTIsysSisoDiscrete(pole, Ts, y0[i]) for i in range(self.N)]
+
+        if isinstance(pole, (list, tuple, np.ndarray)):
+            assert len(pole) == self.N
+        else:
+            pole = [float(pole)] * self.N
+
+        self.filters = [k1OrderLTIsysSisoDiscrete(pole[i], Ts, y0[i]) for i in range(self.N)]
 
     def update(self, x):
         """

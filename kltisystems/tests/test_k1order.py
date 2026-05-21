@@ -11,11 +11,7 @@ from kltisystems import fn_example_siso, fn_example_mimo
 from knavigation import kArray
 from math        import exp
 import numpy as np
-#import math
-#import pytest
-#from unittest.mock import patch
-#from numpy         import pi, dot
-#from math          import sqrt
+import pytest
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 #>>                                                      >>
@@ -111,5 +107,27 @@ class TestClass_1OrderDiscreteMimo:
             #print(f"y = {y};    sol = {fn_solution(y0, 1.0, pole, t)}")
             for i in range(2):
                 assert abs(y[i] - fn_solution(y0[i], 0.0, pole, t)) < 1e-6
+
+    def test_input_multiple_poles(self):
+        pole = [-2.0, -1]
+        y0   = [3.0, 5.0]
+        Ts   = 1./1e3 # [s]
+
+        f1d = k1OrderLTIsysMimoDiscrete(pole, Ts, y0)
+
+        for t in np.arange(Ts, 1.0, Ts):
+            y = f1d.update(kArray([0,0], hvector=False))
+
+            #print(f"y = {y};    sol = {fn_solution(y0, 1.0, pole, t)}")
+            for i in range(2):
+                assert abs(y[i] - fn_solution(y0[i], 0.0, pole[i], t)) < 1e-6
+
+    def test_input_multiple_poles_one_instable(self):
+        pole = [-2.0, 2]
+        y0   = [3.0, 5.0]
+        Ts   = 1./1e3 # [s]
+
+        with pytest.raises(Exception) as e:
+            f1d = k1OrderLTIsysMimoDiscrete(pole, Ts, y0)
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>

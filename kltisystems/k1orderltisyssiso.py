@@ -67,6 +67,8 @@ class k1OrderLTIsysSisoDiscrete:
           c = (2+a.T)
           k = 1/(2-a.T)
         """
+        if a>0:
+            raise ValueError(f'the pole "a={a}" is instable')
 
         k = 2.-(a*Ts)
 
