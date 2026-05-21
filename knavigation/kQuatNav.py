@@ -191,6 +191,58 @@ class kQuatNav:
         dq = (0.5 * B * cq) + (K*epslon*cq)
         return self.__class__( dq )
 
+    def to_Mplus(self):
+        """
+        There are at least two ways to rewrite the quaternion multiplication as
+        matrix multiplications:
+
+        q1 o q2  =  M+ . q2
+
+        or
+
+        q1 o q2  =  M- . q1
+
+        This method calculates M+(q1).
+        """
+
+        real = self.squeeze()[0]
+
+        imag = kArray(self.squeeze()[1:], hvector=False) # we will need to_skew() in kArray().
+        assert imag.shape == (3,1)
+
+        Mplus = np.vstack((
+            np.hstack((real, (-imag.T).to_list())),
+            np.hstack((imag, (real*np.eye(3)) + imag.to_skew())),
+        ))
+
+        return self.__class__( Mplus )
+
+    def to_Mminus(self):
+        """
+        There are at least two ways to rewrite the quaternion multiplication as
+        matrix multiplications:
+
+        q1 o q2  =  M+ . q2
+
+        or
+
+        q1 o q2  =  M- . q1
+
+        This method calculates M-(q2).
+        """
+
+        real = self.squeeze()[0]
+
+        imag = kArray(self.squeeze()[1:], hvector=False) # we will need to_skew() in kArray().
+        assert imag.shape == (3,1)
+
+        Mminus = np.vstack((
+            np.hstack((real, (-imag.T).to_list())),
+            np.hstack((imag, (real*np.eye(3)) - imag.to_skew())),
+        ))
+
+        return self.__class__( Mminus )
+
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>

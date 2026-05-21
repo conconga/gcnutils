@@ -141,13 +141,13 @@ class TestClass_kQuatNav:
             qnew = qa2b._q_x_q(qb2c)
 
             for i,j in zip(qa2c, qnew):
-                assert (i-j) < 1e-10
+                assert abs(i-j) < 1e-10
 
             e1 = qa2c.Q2euler().to_deg()
             e2 = qnew.Q2euler().to_deg()
 
             for i,j in zip(e1,e2):
-                assert (i-j) < 1e-10
+                assert abs(i-j) < 1e-10
 
     def test_q_x_q1(self):
         for _ in range(100):
@@ -236,5 +236,41 @@ class TestClass_kQuatNav:
                 print("euler angles at [k+1] (from R)")
                 print(euler_from_R_inv)
                 print()
+
+    def test_Mplus(self):
+        for _ in range(50):
+            euler_rad = kArrayNav( self.get_random_euler_rad() )
+            qa2b = kArrayNav( euler_rad).euler2Q()
+
+            euler_rad = kArrayNav( self.get_random_euler_rad() )
+            qb2c = kArrayNav( euler_rad ).euler2Q()
+
+            # ground truth:
+            qa2c = qa2b.q_x_q(qb2c)
+
+            # qa2c = qa2b.M+ x qb2c
+            qtst = qa2b.to_Mplus() * qb2c
+
+            # test:
+            for i,j in zip(qa2c, qtst):
+                assert abs(i-j) < 1e-10
+
+    def test_Mminus(self):
+        for _ in range(50):
+            euler_rad = kArrayNav( self.get_random_euler_rad() )
+            qa2b = kArrayNav( euler_rad).euler2Q()
+
+            euler_rad = kArrayNav( self.get_random_euler_rad() )
+            qb2c = kArrayNav( euler_rad ).euler2Q()
+
+            # ground truth:
+            qa2c = qa2b.q_x_q(qb2c)
+
+            # qa2c = qb2c.M- x qa2b
+            qtst = qb2c.to_Mminus() * qa2b
+
+            # test:
+            for i,j in zip(qa2c, qtst):
+                assert abs(i-j) < 1e-10
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
