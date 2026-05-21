@@ -60,6 +60,7 @@ class k1OrderLTIsysMimoDiscrete:
             pole = [float(pole)] * self.N
 
         self.filters = [k1OrderLTIsysSisoDiscrete(pole[i], Ts, y0[i]) for i in range(self.N)]
+        self.y       = [ self.filters[i].y for i in range(self.N) ]
 
     def update(self, x):
         """

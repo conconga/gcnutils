@@ -62,6 +62,16 @@ derivative of any order fo the input signal.
     f1d  = k1OrderLTIsysMimo(pole, Ts, y0)
 ```
 
+Alternatively the system allows multiple poles, one per state:
+
+```python
+    pole = [-1, -2, -3]
+    y0   = [1,2,3] # <= initial state, and size of the filter
+    Ts   = 1e-1    # [s] sampling period
+
+    f1d  = k1OrderLTIsysMimo(pole, Ts, y0)
+```
+
 #### to integrate up to the next time step:
 ```python
     x = [3, 4, 5]     # <= inputs

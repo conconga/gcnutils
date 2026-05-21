@@ -130,4 +130,15 @@ class TestClass_1OrderDiscreteMimo:
         with pytest.raises(Exception) as e:
             f1d = k1OrderLTIsysMimoDiscrete(pole, Ts, y0)
 
+    def test_single_state_vector(self):
+        pole = [-2.0, -1]
+        y0   = [3.1, 5.1]
+        Ts   = 1./1e3 # [s]
+
+        f1d = k1OrderLTIsysMimoDiscrete(pole, Ts, y0)
+
+        for i in range(2):
+            assert int(f1d.y[i]) == int(y0[i])
+
+
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
