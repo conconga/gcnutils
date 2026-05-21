@@ -255,6 +255,18 @@ class TestClass_kQuatNav:
             for i,j in zip(qa2c, qtst):
                 assert abs(i-j) < 1e-10
 
+    def test_M_matrices_against_3D_vector(self):
+        euler = kArrayNav([0,0,45]).to_rad()
+        q_b2a = euler.euler2Q()
+        v_b   = kArrayNav([1,0,0])
+        v_a   = q_b2a.q_x_3d(v_b) # ground truth
+
+        v_B   = np.hstack(([[0]],v_b)) # augmented vector to quaternion
+        v_tst = q_b2a.to_Mminus() * q_b2a.q_conj().to_Mplus() * v_B.reshape(4,1)
+
+        for i,j in zip(v_a, v_tst[1:]):
+            assert abs(i-j) < 1e-10
+
     def test_Mminus(self):
         for _ in range(50):
             euler_rad = kArrayNav( self.get_random_euler_rad() )

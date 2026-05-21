@@ -205,10 +205,12 @@ class kQuatNav:
         This method calculates M+(q1).
         """
 
-        real = self.squeeze()[0]
-
-        imag = kArray(self.squeeze()[1:], hvector=False) # we will need to_skew() in kArray().
-        assert imag.shape == (3,1)
+        if len(self.squeeze()) == 3:
+            real = 0
+            imag = kArray(self, hvector=False) # we will need to_skew() in kArray().
+        else:
+            real = self.squeeze()[0]
+            imag = kArray(self.squeeze()[1:], hvector=False) # we will need to_skew() in kArray().
 
         Mplus = np.vstack((
             np.hstack((real, (-imag.T).to_list())),
@@ -231,10 +233,12 @@ class kQuatNav:
         This method calculates M-(q2).
         """
 
-        real = self.squeeze()[0]
-
-        imag = kArray(self.squeeze()[1:], hvector=False) # we will need to_skew() in kArray().
-        assert imag.shape == (3,1)
+        if len(self.squeeze()) == 3:
+            real = 0
+            imag = kArray(self, hvector=False) # we will need to_skew() in kArray().
+        else:
+            real = self.squeeze()[0]
+            imag = kArray(self.squeeze()[1:], hvector=False) # we will need to_skew() in kArray().
 
         Mminus = np.vstack((
             np.hstack((real, (-imag.T).to_list())),
