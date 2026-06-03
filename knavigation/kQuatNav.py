@@ -142,7 +142,11 @@ class kQuatNav:
         # quaternion and have the correct input for the transformation without
         # the C matrix.
         q = self.q_inv().squeeze() # <== first, use the inverse; see comments in the docstring
-        v = vector.squeeze()
+
+        if isinstance(vector, (tuple, list)):
+            v = vector
+        else:
+            v = vector.squeeze()
 
         # checks:
         assert len(q) == 4
