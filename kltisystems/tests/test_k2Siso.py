@@ -252,6 +252,173 @@ class TestClass_2Order:
 
         assert limit-0.01 < log[-1] < limit+0.01
 
+    def test_min_state_c(self):
+
+        qsi, Fs, Ts, T = self.setup_parameters()
+        limit = 1.7
+
+        sys = k2OrderLTIsysSisoFactory(
+            qsi      = qsi,
+            wn       = 2*pi*10,
+            x0       = 2,
+            min_dxdt = -inf,
+            max_dxdt = +inf,
+            min_x    = limit,
+            max_x    = +inf,
+        )
+
+        log = self.simulate_one_second(sys, T)
+        log = [i[0] for i in log]
+
+        assert limit-0.01 < log[-1] < limit+0.01
+
+    def test_min_state_d(self):
+
+        qsi, Fs, Ts, T = self.setup_parameters()
+        limit = 1.7
+
+        sys = k2OrderLTIsysSisoFactory(
+            qsi      = qsi,
+            wn       = 2*pi*10,
+            x0       = 2,
+            min_dxdt = -inf,
+            max_dxdt = +inf,
+            min_x    = limit,
+            max_x    = +inf,
+            Ts       = Ts,
+        )
+
+        log = self.simulate_one_second(sys, T)
+        log = [i[0] for i in log]
+
+        assert limit-0.01 < log[-1] < limit+0.01
+
+    def test_maxdxdt_c(self):
+
+        qsi, Fs, Ts, T = self.setup_parameters()
+        limit = 1./0.6
+
+        sys = k2OrderLTIsysSisoFactory(
+            qsi      = qsi,
+            wn       = 2*pi*10,
+            x0       = 0,
+            min_dxdt = -inf,
+            max_dxdt = limit,
+            min_x    = -inf,
+            max_x    = +inf,
+        )
+
+        log = self.simulate_one_second(sys, T)
+        log_x  = [i[0] for i in log]
+        log_dx = [i[1] for i in log]
+
+        if 1 == 0:
+            import matplotlib.pyplot as plt
+            plt.figure(1).clf()
+            fig,ax = plt.subplots(2,1,num=1)
+            ax[0].plot(T,log_x)
+            ax[1].plot(T,log_dx)
+            plt.show(block=True)
+
+        assert log_x[int(Fs*0.5)] < 1.0
+        assert abs(log_x[int(Fs*0.7)] - 1.0) < 1e-3
+        assert abs(max(log_dx) - limit) < 0.1
+
+    def test_maxdxdt_d(self):
+
+        qsi, Fs, Ts, T = self.setup_parameters()
+        limit = 1./0.6
+
+        sys = k2OrderLTIsysSisoFactory(
+            qsi      = qsi,
+            wn       = 2*pi*10,
+            x0       = 0,
+            min_dxdt = -inf,
+            max_dxdt = limit,
+            min_x    = -inf,
+            max_x    = +inf,
+            Ts       = Ts,
+        )
+
+        log = self.simulate_one_second(sys, T)
+        log_x  = [i[0] for i in log]
+        log_dx = [i[1] for i in log]
+
+        if 0 == 1:
+            import matplotlib.pyplot as plt
+            plt.figure(1).clf()
+            fig,ax = plt.subplots(2,1,num=1)
+            ax[0].plot(T,log_x)
+            ax[1].plot(T,log_dx)
+            plt.show(block=True)
+
+        assert log_x[int(Fs*0.5)] < 1.0
+        assert abs(log_x[int(Fs*0.7)] - 1.0) < 1e-3
+        assert abs(max(log_dx) - limit) < 1e-3
+
+    def test_minxdt_c(self):
+
+        qsi, Fs, Ts, T = self.setup_parameters()
+        limit = -1./0.6
+
+        sys = k2OrderLTIsysSisoFactory(
+            qsi      = qsi,
+            wn       = 2*pi*10,
+            x0       = 2,
+            min_dxdt = limit,
+            max_dxdt = +inf,
+            min_x    = -inf,
+            max_x    = +inf,
+        )
+
+        log = self.simulate_one_second(sys, T)
+        log_x  = [i[0] for i in log]
+        log_dx = [i[1] for i in log]
+
+        if 0 == 1:
+            import matplotlib.pyplot as plt
+            plt.figure(1).clf()
+            fig,ax = plt.subplots(2,1,num=1)
+            ax[0].plot(T,log_x)
+            ax[1].plot(T,log_dx)
+            plt.show(block=True)
+
+        assert log_x[int(Fs*0.5)] > 1.0
+        assert abs(log_x[int(Fs*0.7)] - 1.0) < 1e-3
+        assert abs(min(log_dx) - limit) < 0.3
+
+    def test_minxdt_d(self):
+
+        qsi, Fs, Ts, T = self.setup_parameters()
+        limit = -1./0.6
+
+        sys = k2OrderLTIsysSisoFactory(
+            qsi      = qsi,
+            wn       = 2*pi*10,
+            x0       = 2,
+            min_dxdt = limit,
+            max_dxdt = +inf,
+            min_x    = -inf,
+            max_x    = +inf,
+            Ts       = Ts,
+        )
+
+        log = self.simulate_one_second(sys, T)
+        log_x  = [i[0] for i in log]
+        log_dx = [i[1] for i in log]
+
+        if 1 == 0:
+            import matplotlib.pyplot as plt
+            plt.figure(1).clf()
+            fig,ax = plt.subplots(2,1,num=1)
+            ax[0].plot(T,log_x)
+            ax[1].plot(T,log_dx)
+            plt.show(block=True)
+
+        assert log_x[int(Fs*0.5)] > 1.0
+        assert abs(log_x[int(Fs*0.7)] - 1.0) < 1e-3
+        assert abs(min(log_dx) - limit) < 1e-3
+
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 #>>                                                      >>
