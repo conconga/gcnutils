@@ -178,7 +178,7 @@ class k2OrderLTIsysSisoDiscrete (kCommon2OrderLTIsysSiso):
             self.Ad  = dot(np.eye(2) + (0.5*self.Ts*self.Ac), aux)
             self.Bd  = dot(aux, self.Bc) * self.Ts
 
-    def update(self, t, u):
+    def update(self, u):
         """
         Discrete time update.
         u: input at time t

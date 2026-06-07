@@ -7,8 +7,13 @@ print(f"** sys.path[0] = {sys.path[0]}")
 
 from kltisystems import k2OrderLTIsysSisoFactory
 import numpy   as np
-from   numpy   import inf
+from   numpy   import inf, pi
 import pytest
+
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
+def fn_set_trace():
+    import pudb
+    pudb.set_trace()
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 #>>                                                      >>
@@ -74,7 +79,7 @@ class TestClass_Example:
 
             # updates:
             c.update(t,u)
-            d.update(t,u)
+            d.update(u)
 
             # log:
             log_t2.append([t,u] + c.get_state().tolist() + d.get_state().tolist())
@@ -123,6 +128,130 @@ class TestClass_Example:
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 #>>                                                      >>
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
+
+class TestClass_2Order:
+
+    def setup_parameters(self):
+
+        qsi = 0.5
+        Fs  = 1000 # [Hz]
+        Ts  = 1./Fs
+        T   = np.arange(0,1,Ts)
+
+        return qsi, Fs, Ts, T
+
+    def simulate_one_second(self, sys, T):
+        log_lti = list()
+
+        for t in T:
+            try:
+                # discrete:
+                sys.update(1)
+            except:
+                # continuous:
+                sys.update(t, 1)
+
+            # buffer:
+            log_lti.append(sys.get_state())
+
+        return log_lti
+
+    def test_overshoot_continuous(self):
+
+        qsi, Fs, Ts, T = self.setup_parameters()
+
+        sys = k2OrderLTIsysSisoFactory(
+            qsi      = qsi,
+            wn       = 2*pi*10,
+            x0       = 0,
+            min_dxdt = -inf,
+            max_dxdt = +inf,
+            min_x    = -inf,
+            max_x    = +inf,
+        )
+
+        log = self.simulate_one_second(sys, T)
+        log = [i[0] for i in log]
+
+        # overshoot:
+        Mp = np.exp(-pi*(qsi/np.sqrt(1.0 - (qsi**2)))) # [%]
+        Ms = max(log)
+        assert abs(Mp - (Ms-1)) < 1e-3
+
+        if False:
+            print()
+            print(f"expected     = {Mp:.3f}%")
+            print(f"max(samples) = {max(log):.3f}")
+
+    def test_overshoot_discrete(self):
+
+        qsi, Fs, Ts, T = self.setup_parameters()
+
+        sys = k2OrderLTIsysSisoFactory(
+            qsi      = qsi,
+            wn       = 2*pi*10,
+            x0       = 0,
+            min_dxdt = -inf,
+            max_dxdt = +inf,
+            min_x    = -inf,
+            max_x    = +inf,
+            Ts       = Ts,    # <= discrete
+        )
+
+        log = self.simulate_one_second(sys, T)
+        log = [i[0] for i in log]
+
+        # overshoot:
+        Mp = np.exp(-pi*(qsi/np.sqrt(1.0 - (qsi**2)))) # [%]
+        Ms = max(log)
+        assert abs(Mp - (Ms-1)) < 1e-3
+
+        if 1 == 0:
+            print()
+            print(f"expected     = {Mp:.3f}%")
+            print(f"max(samples) = {max(log):.3f}")
+
+    def test_max_state_c(self):
+
+        qsi, Fs, Ts, T = self.setup_parameters()
+        limit = 0.7
+
+        sys = k2OrderLTIsysSisoFactory(
+            qsi      = qsi,
+            wn       = 2*pi*10,
+            x0       = 0,
+            min_dxdt = -inf,
+            max_dxdt = +inf,
+            min_x    = -inf,
+            max_x    = limit,
+        )
+
+        log = self.simulate_one_second(sys, T)
+        log = [i[0] for i in log]
+
+        assert limit-0.01 < log[-1] < limit+0.01
+
+    def test_max_state_d(self):
+
+        qsi, Fs, Ts, T = self.setup_parameters()
+        limit = 0.7
+
+        sys = k2OrderLTIsysSisoFactory(
+            qsi      = qsi,
+            wn       = 2*pi*10,
+            x0       = 0,
+            min_dxdt = -inf,
+            max_dxdt = +inf,
+            min_x    = -inf,
+            max_x    = limit,
+            Ts       = Ts,
+        )
+
+        log = self.simulate_one_second(sys, T)
+        log = [i[0] for i in log]
+
+        assert limit-0.01 < log[-1] < limit+0.01
+
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 #>>                                                      >>
