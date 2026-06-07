@@ -144,7 +144,7 @@ class k2OrderLTIsysMimoContinuos (kCommon2OrderLTIsysMimo):
         super().__init__(*args, **kargs)
         self.curr_t = 0
 
-    def _c_update(self, t, u):
+    def update(self, t, u):
         """
         Continuous time update.
         x: state at time t
@@ -164,7 +164,7 @@ class k2OrderLTIsysMimoDiscrete (kCommon2OrderLTIsysMimo):
     def __init__(self, *args, **kargs):
         super().__init__(*args, **kargs)
 
-    def _d_update(self, t, u):
+    def update(self, u):
         """
         Discrete time update.
         u: input at time t
@@ -176,104 +176,48 @@ class k2OrderLTIsysMimoDiscrete (kCommon2OrderLTIsysMimo):
         u = self._fn_fill_config_list(u)
 
         for i in range(self.n):
-            self.siso[i].update(t, u[i])
+            self.siso[i].update(u[i])
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 #                                                                                  #
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
-class k2OrderLTIsysMimo (k2OrderLTIsysMimoContinuos, k2OrderLTIsysMimoDiscrete):
-    def __init__(self, *args, **kargs):
-        """
-            MIMO second order LTI filter.
+def k2OrderLTIsysMimoFactory(*args, **kargs):
+    """
+        MIMO second order LTI filter.
 
-            For continuous simulation, use these methods:
-                ._c_update() to update the current state.
+        For continuous simulation, use these methods:
+            .update() to update the current state.
 
-            For discrete simulation (Ts>0), use this method:
-                ._d_update() to update the current state for a given reference input value.
+        For discrete simulation (Ts>0), use this method:
+            .update() to update the current state for a given reference input value.
 
-            The parameters 'qsi,wn,min_dxdt, max_dxdt, min_x, max_x' shall be
-            either scalars, vectors or lists. The parameter 'Ts' shall be a scalar, if any.
+        The parameters 'qsi,wn,min_dxdt, max_dxdt, min_x, max_x' shall be
+        either scalars, vectors or lists. The parameter 'Ts' shall be a scalar, if any.
 
-            The dimension of 'x0' defines the number of internal SISO systems.
+        The dimension of 'x0' defines the number of internal SISO systems.
 
-            The MIMO state vector represents each two values one single SISO state vector:
+        The MIMO state vector represents each two values one single SISO state vector:
 
-            state =   [   x1    ]
-                      [ dot{x1} ]
-                      [   x2    ]
-                      [ dot{x2} ]
-                      [   ...   ]
-                      [   xn    ]
-                      [ dot{xn} ]
+        state =   [   x1    ]
+                  [ dot{x1} ]
+                  [   x2    ]
+                  [ dot{x2} ]
+                  [   ...   ]
+                  [   xn    ]
+                  [ dot{xn} ]
 
-            The methods interleave() and deinterleave() change the representation of state.
-        """
-        super().__init__(*args, **kargs)
+        The methods interleave() and deinterleave() change the representation of state.
+    """
 
-    def update(self, *args):
+    Ts = kargs.get('Ts', None)
 
-        if self.Ts > 0:
-            # discrete:
-            self._d_update(*args)
+    # when Ts is defined:
+    if Ts is not None:
+        if Ts > 0:
+            return k2OrderLTIsysMimoDiscrete(*args, **kargs)
         else:
-            # continuous:
-            self._c_update(*args)
+            raise NotImplementedError("this will NEVER be implemented!")
+    else:
+        return k2OrderLTIsysMimoContinuos(*args, **kargs)
 
-#################################
-## ##WWww=--  main:  --=wwWW## ##
-#################################
-class k2OrderLTIsysMimoTests:
-    def do_tests(self):
-
-        from   scipy.integrate    import odeint
-        import matplotlib.pyplot  as plt
-
-        Fs  = 200 # [Hz]
-        Ts  = 1./Fs
-        T   = np.arange(0,2,Ts)
-        U   = (T > 0.5) * 1.0
-
-        #UmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUmUm#
-        # test of MIMO systems:
-
-        mimo_c = k2OrderLTIsysMimo(0.7, 2.*np.pi*20, np.asarray([0,1]), -5, 5, -2, [0.8,1.1])
-        mimo_d = k2OrderLTIsysMimo(0.7, 2.*np.pi*20, np.asarray([0,1]), -5, 5, -2, [0.8,1.1], Ts=Ts)
-        mimo_c_buf = [];
-        mimo_d_buf = [];
-
-        for t,u in zip(T,U):
-
-            # integration:
-            # continuous:
-            mimo_c.update(t, u)
-
-            # discrete:
-            mimo_d.update(t, u)
-
-            # buffer:
-            mimo_c_buf.append([t,u] + mimo_c.get_state().tolist())
-            mimo_d_buf.append([t,u] + mimo_d.get_state().tolist())
-
-        mimo_c_buf = np.asarray(mimo_c_buf)
-        mimo_d_buf = np.asarray(mimo_d_buf)
-
-        #  - #  - #  - #  - #  - #  - #  - #  - # - #
-        # figures:
-        #  - #  - #  - #  - #  - #  - #  - #  - # - #
-
-        #----- new figure -----#
-        plt.figure(3), plt.clf()
-        plt.plot(mimo_c_buf[:,0], mimo_c_buf[:,1:])
-        plt.grid(True)
-        plt.legend(('signal', 'c1', 'dot{c1}', 'c2', 'dot{c2}'))
-
-        #----- new figure -----#
-        plt.figure(4), plt.clf()
-        plt.plot(mimo_d_buf[:,0], mimo_d_buf[:,1:])
-        plt.grid(True)
-        plt.legend(('signal', 'd1', 'dot{d1}', 'd2', 'dot{d2}'))
-
-        plt.show(block=False)
-
-#====================================#
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
