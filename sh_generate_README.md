@@ -2,7 +2,7 @@
 
 #cat README.md.before_pandoc | pandoc --from markdown+grid_tables --toc -s -f markdown-tex_math_dollars --number-sections --to gfm - > README.md
 
-find . -type f | grep "README.md.before_pandoc" | while read nome; do
+find . -type f | grep "README.md.before_pandoc$" | while read nome; do
     name=`basename "${nome}"`
     dir=`dirname "${nome}"`
     echo "converting ${name} at '${dir}'..."

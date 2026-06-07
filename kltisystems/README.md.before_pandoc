@@ -107,8 +107,6 @@ Alternatively the system allows multiple poles, one per state:
 ```
 
 
-\TODO TODO \TODO TODO \TODO TODO \TODO TODO
-
 ## k2OrderLTIsysMimo
 
 ### to create a MIMO continuous 2-order LTI system:
