@@ -15,7 +15,7 @@ GitHub:
 ##WWww=--  import section: --=wwWW##
 import numpy   as np
 from   numpy   import inf
-from   .k2orderltisyssiso import k2OrderLTIsysSiso
+from   .k2orderltisyssiso import k2OrderLTIsysSisoFactory
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 #                                                                                  #
@@ -49,7 +49,7 @@ class kCommon2OrderLTIsysMimo:
         self.max_dxdt = self._fn_fill_config_list(max_dxdt)
 
         # instances of k2OrderLTIsysSiso:
-        self.siso = [ k2OrderLTIsysSiso(
+        self.siso = [ k2OrderLTIsysSisoFactory(
             self.qsi[i],
             self.wn[i],
             self.x0[i],
