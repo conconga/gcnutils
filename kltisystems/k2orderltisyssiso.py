@@ -16,6 +16,7 @@ GitHub:
 import numpy           as np
 from   numpy           import dot
 from   scipy.integrate import odeint
+from scipy.integrate   import solve_ivp
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 #                                                                                  #
@@ -137,7 +138,22 @@ class k2OrderLTIsysSisoContinuous (kCommon2OrderLTIsysSiso):
 
         if t > self.curr_t:
             t0 = self.curr_t
-            _,y = odeint(self._dstate_dt, self.get_state(), [t0, t], (u,))
+
+            if False:
+                _, y = odeint(self._dstate_dt, self.get_state(), [t0, t], (u,))
+
+            else:
+                # using this solver to avoid warnings due to stiffness of _dstate_dt().
+                sol = solve_ivp(
+                        lambda tau, x: self._dstate_dt(x, tau, u),
+                        (t0, t),
+                        self.get_state(),
+                        method="RK45",   # or "Radau" if stiff
+                        max_step=self.Ts if self.Ts > 0 else (t - t0)
+                )
+
+                y = sol.y[:, -1]
+
             self.curr_t = t
 
             self.x  = np.asarray(y)
