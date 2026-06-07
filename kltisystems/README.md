@@ -1,48 +1,44 @@
 - [<span class="toc-section-number">1</span>
   Introduction](#introduction)
 - [<span class="toc-section-number">2</span> Classes](#classes)
-  - [<span class="toc-section-number">2.1</span> Order 1st, LTI System,
-    SISO](#order-1st-lti-system-siso)
-    - [<span class="toc-section-number">2.1.1</span> to create a SISO
-      1st-order LTI System:](#to-create-a-siso-1st-order-lti-system)
-    - [<span class="toc-section-number">2.1.2</span> to integrate up to
-      an instant in time](#to-integrate-up-to-an-instant-in-time)
-  - [<span class="toc-section-number">2.2</span> Order 1st, LTI System,
-    MIMO](#order-1st-lti-system-mimo)
-    - [<span class="toc-section-number">2.2.1</span> to create a MIMO
-      discrete 1st-order LTI
-      System:](#to-create-a-mimo-discrete-1st-order-lti-system)
-    - [<span class="toc-section-number">2.2.2</span> to integrate up to
-      the next time step:](#to-integrate-up-to-the-next-time-step)
-  - [<span class="toc-section-number">2.3</span> Order 2nd, LTI System,
-    SISO](#order-2nd-lti-system-siso)
-    - [<span class="toc-section-number">2.3.1</span> to create a SISO
-      2-order LTI system:](#to-create-a-siso-2-order-lti-system)
-    - [<span class="toc-section-number">2.3.2</span> to update the
-      systems:](#to-update-the-systems)
-    - [<span class="toc-section-number">2.3.3</span> to get the current
-      state:](#to-get-the-current-state)
-  - [<span class="toc-section-number">2.4</span>
-    k2OrderLTIsysMimo](#k2orderltisysmimo)
-    - [<span class="toc-section-number">2.4.1</span> to create a MIMO
-      continuous 2-order LTI
-      system:](#to-create-a-mimo-continuous-2-order-lti-system)
-    - [<span class="toc-section-number">2.4.2</span> to create a MIMO
-      discrete 2-order LTI
-      system:](#to-create-a-mimo-discrete-2-order-lti-system)
-    - [<span class="toc-section-number">2.4.3</span> to update the
-      systems:](#to-update-the-systems-1)
-    - [<span class="toc-section-number">2.4.4</span> to get the current
-      state:](#to-get-the-current-state-1)
-  - [<span class="toc-section-number">2.5</span>
-    kNOrderDerivativeSiso](#knorderderivativesiso)
-    - [<span class="toc-section-number">2.5.1</span> to create a system
-      (filter):](#to-create-a-system-filter)
-    - [<span class="toc-section-number">2.5.2</span> to update the
-      inputs and get new
-      outputs:](#to-update-the-inputs-and-get-new-outputs)
-- [<span class="toc-section-number">3</span> How to use](#how-to-use)
-  - [<span class="toc-section-number">3.1</span> Example calculating the
+- [<span class="toc-section-number">3</span> Order 1st, LTI System,
+  SISO](#order-1st-lti-system-siso)
+  - [<span class="toc-section-number">3.1</span> to create a SISO
+    1st-order LTI System:](#to-create-a-siso-1st-order-lti-system)
+  - [<span class="toc-section-number">3.2</span> to integrate up to an
+    instant in time](#to-integrate-up-to-an-instant-in-time)
+- [<span class="toc-section-number">4</span> Order 1st, LTI System,
+  MIMO](#order-1st-lti-system-mimo)
+  - [<span class="toc-section-number">4.1</span> to create a MIMO
+    discrete 1st-order LTI
+    System:](#to-create-a-mimo-discrete-1st-order-lti-system)
+  - [<span class="toc-section-number">4.2</span> to integrate up to the
+    next time step:](#to-integrate-up-to-the-next-time-step)
+- [<span class="toc-section-number">5</span> Order 2nd, LTI System,
+  SISO](#order-2nd-lti-system-siso)
+  - [<span class="toc-section-number">5.1</span> to create a SISO
+    2-order LTI system:](#to-create-a-siso-2-order-lti-system)
+  - [<span class="toc-section-number">5.2</span> to update the
+    systems:](#to-update-the-systems)
+  - [<span class="toc-section-number">5.3</span> to get the current
+    state:](#to-get-the-current-state)
+- [<span class="toc-section-number">6</span> Order 2nd, LTI System,
+  MIMO](#order-2nd-lti-system-mimo)
+  - [<span class="toc-section-number">6.1</span> to create a MIMO
+    continuous 2-order LTI
+    system:](#to-create-a-mimo-continuous-2-order-lti-system)
+  - [<span class="toc-section-number">6.2</span> to update the
+    systems:](#to-update-the-systems-1)
+  - [<span class="toc-section-number">6.3</span> to get the current
+    state:](#to-get-the-current-state-1)
+- [<span class="toc-section-number">7</span> kNOrderDerivativeSiso
+  ()](#knorderderivativesiso)
+  - [<span class="toc-section-number">7.1</span> to create a system
+    (filter):](#to-create-a-system-filter)
+  - [<span class="toc-section-number">7.2</span> to update the inputs
+    and get new outputs:](#to-update-the-inputs-and-get-new-outputs)
+- [<span class="toc-section-number">8</span> How to use](#how-to-use)
+  - [<span class="toc-section-number">8.1</span> Example calculating the
     first derivative of a stochastic
     signal](#example-calculating-the-first-derivative-of-a-stochastic-signal)
 
@@ -64,40 +60,40 @@ derivative of any order fo the input signal.
 # Classes
 ![classes.png](classes.png?raw=true "UML generated by pyreverse")
 
-## Order 1st, LTI System, SISO
+# Order 1st, LTI System, SISO
 
-### to create a SISO 1st-order LTI System:
+## to create a SISO 1st-order LTI System:
 ```python
     pole = -2.0
     y0   =  3.0
-    # either:
+    # either continuous:
     f1c  = k1OrderLTIsysSisoFactory(pole, y0)
-    # or:
+    # or discrete:
     Ts   =  1e-3 # <= sampling time, in [s]
     f1d = k1OrderLTIsysSisoFactory(pole, Ts, y0)
 ```
 
-### to integrate up to an instant in time
+## to integrate up to an instant in time
 ```python
     x = 10. # <= input
     # either:
     y = f1c.update(time, x)
-    # or:
+    # or (up to the next time step):
     y = f1d.update(x)
 ```
 
 
 
+# Order 1st, LTI System, MIMO
 
-## Order 1st, LTI System, MIMO
-
-### to create a MIMO discrete 1st-order LTI System:
+## to create a MIMO discrete 1st-order LTI System:
 ```python
     pole = -2.0
     y0   = [1,2,3] # <= initial state, and size of the filter
     Ts   = 1e-1    # [s] sampling period
 
-    f1d  = k1OrderLTIsysMimo(pole, Ts, y0)
+    f1d  = k1OrderLTIsysMimoDiscrete(pole, Ts, y0)
+
 ```
 
 Alternatively the system allows multiple poles, one per state:
@@ -107,10 +103,10 @@ Alternatively the system allows multiple poles, one per state:
     y0   = [1,2,3] # <= initial state, and size of the filter
     Ts   = 1e-1    # [s] sampling period
 
-    f1d  = k1OrderLTIsysMimo(pole, Ts, y0)
+    f1d  = k1OrderLTIsysMimoDiscrete(pole, Ts, y0)
 ```
 
-### to integrate up to the next time step:
+## to integrate up to the next time step:
 ```python
     x = [3, 4, 5]     # <= inputs
     y = f1d.update(x) # <= from [k-1] to [k]
@@ -118,9 +114,9 @@ Alternatively the system allows multiple poles, one per state:
 
 
 
-## Order 2nd, LTI System, SISO
+# Order 2nd, LTI System, SISO
 
-### to create a SISO 2-order LTI system:
+## to create a SISO 2-order LTI system:
 ```python
 """
     qsi      : damping factor        
@@ -134,12 +130,12 @@ Alternatively the system allows multiple poles, one per state:
 """
 
     # either:
-    lti_continuous = k2OrderLTIsysSisoFactory (self, qsi, wn, x0, min_dxdt, max_dxdt, min_x, max_x, Ts=0)
+    lti_continuous = k2OrderLTIsysSisoFactory (self, qsi, wn, x0, min_dxdt, max_dxdt, min_x, max_x)
     # or:
     lti_discrete   = k2OrderLTIsysSisoFactory (self, qsi, wn, x0, min_dxdt, max_dxdt, min_x, max_x, Ts=Ts)
 ```
 
-### to update the systems:
+## to update the systems:
 
 ```python
     t : update up to this time (only continuous, not used for the discrete)
@@ -149,16 +145,19 @@ Alternatively the system allows multiple poles, one per state:
     lti_discrete.update(u)
 ```
 
-### to get the current state:
+## to get the current state:
 ```
     out, dout_dt = lti.get_state()
 ```
 
 
-## k2OrderLTIsysMimo
 
-### to create a MIMO continuous 2-order LTI system:
-```
+
+# Order 2nd, LTI System, MIMO
+
+## to create a MIMO continuous 2-order LTI system:
+```python
+"""
     qsi      : damping factor         : scalar
     wn       : [rad/s] natural freq.  : scalar
     x0       : initial state          : N=len(x0) is the length of inputs and outputs of the MIMO system
@@ -166,40 +165,35 @@ Alternatively the system allows multiple poles, one per state:
     max_dxdt : max rate slope         : scalar, list[N], vector[N]
     min_x    : min output             : scalar, list[N], vector[N]
     max_x    : max output             : scalar, list[N], vector[N]
+"""
 
-    ltimimo_continuous = k2OrderLTIsysMimo (self, qsi, wn, x0, min_dxdt, max_dxdt, min_x, max_x, Ts=0)
-```
-### to create a MIMO discrete 2-order LTI system:
-```
-    qsi      : damping factor         : scalar
-    wn       : [rad/s] natural freq.  : scalar
-    x0       : initial state          : N=len(x0) is the length of inputs and outputs of the MIMO system
-    min_dxdt : min rate slope         : scalar, list[N], vector[N]
-    max_dxdt : max rate slope         : scalar, list[N], vector[N]
-    min_x    : min output             : scalar, list[N], vector[N]
-    max_x    : max output             : scalar, list[N], vector[N]
-    Ts       : sampling frequency
+    # either continuous:
+    ltimimo_continuous = k2OrderLTIsysMimoFactory (self, qsi, wn, x0, min_dxdt, max_dxdt, min_x, max_x)
 
-    ltimimo_discrete = k2OrderLTIsysMimo (self, qsi, wn, x0, min_dxdt, max_dxdt, min_x, max_x, Ts=Ts)
+    # or discrete:
+    ltimimo_discrete   = k2OrderLTIsysMimoFactory (self, qsi, wn, x0, min_dxdt, max_dxdt, min_x, max_x, Ts=Ts)
 ```
 
-### to update the systems:
-```
+## to update the systems:
+```python
     t : update up to this time (only continuous, not used for the discrete)
     u : input of the system
 
     ltimimo_continuous.update(t,u)
-    ltimimo_discrete.update(t,u)
+    ltimimo_discrete.update(u)
 ```
 
-### to get the current state:
+## to get the current state:
 ```
     out, dout_dt = lti.get_state()
 ```
 
-## kNOrderDerivativeSiso
 
-### to create a system (filter):
+
+
+# kNOrderDerivativeSiso (\TODO)
+
+## to create a system (filter):
 ```
     order =    4 # when we want y, y', y", y'", y""
     pole  = -100 # fast and stable
@@ -207,7 +201,7 @@ Alternatively the system allows multiple poles, one per state:
     obj   = kNOrderDerivativeSiso( order, pole, Ts )
 ```
 
-### to update the inputs and get new outputs:
+## to update the inputs and get new outputs:
 ```
     out     = obj.update(0.7)
     y       = out[0]
@@ -219,8 +213,3 @@ Alternatively the system allows multiple poles, one per state:
 # How to use
 
 ## Example calculating the first derivative of a stochastic signal
-```python
-    import sys
-    sys.path.append(< up to where folder kltisystems is >)
-    from kltisystems import k2OrderLTIsysSiso, k2OrderLTIsysMimo, kNOrderDerivativeSiso
-```

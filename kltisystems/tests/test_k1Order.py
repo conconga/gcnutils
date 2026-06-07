@@ -7,7 +7,6 @@ print(f"** sys.path[0] = {sys.path[0]}")
 
 from kltisystems import k1OrderLTIsysSisoFactory
 from kltisystems import k1OrderLTIsysMimoDiscrete
-from kltisystems import fn_example_siso, fn_example_mimo
 from knavigation import kArray
 from math        import exp
 import numpy as np
@@ -17,12 +16,92 @@ import pytest
 #>>                                                      >>
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 class TestClass_Example:
+    block = 0
 
     def test_example_siso(self):
-        fn_example_siso()
+
+        import matplotlib.pyplot      as plt
+
+        a    = -10.  # pole for the transfer function:
+        tmax = 2.0
+        Ts   = 5e-3 # sample rate
+        T    = [i*Ts for i in range(int(tmax/Ts)+1)] # time vector
+        f1c  = k1OrderLTIsysSisoFactory(a, 0)
+        f1d  = k1OrderLTIsysSisoFactory(a, Ts, 1)
+
+        log_x  = list()
+        log_yc = list()
+        log_yd = list()
+        for t in T:
+            if (not (t%0.5)):
+                x = float(np.random.rand()) # plant input
+
+            f1c.update(t, x)
+            f1d.update(x)
+            log_x.append(x)
+            log_yc.append(f1c.y)
+            log_yd.append(f1d.y)
+        
+
+        #.............................................#
+        #---- new figure:
+        fig = 0
+
+        #---- new figure:
+        fig = fig + 1
+
+        f = plt.figure(fig)
+        f.canvas.draw() 
+        f.canvas.flush_events()
+
+        f, ax = plt.subplots(1,1,num=fig)
+
+        ax.plot(T, log_x, T, log_yc, T, log_yd)
+        ax.grid(True)
+        ax.legend(('reference', 'continuous', 'discrete'))
+
+        #.............................................#
+        plt.show(block=self.block)
+        #.............................................#
 
     def test_example_mimo(self):
-        fn_example_mimo()
+
+        import matplotlib.pyplot      as plt
+
+        pole = -10. # pole for the transfer function:
+        tmax = 1.0  # [s]
+        Ts   = 5e-3 # sample rate
+        T    = np.arange(0,tmax, Ts)
+        y0   = [1,2,3]
+        f1d  = k1OrderLTIsysMimoDiscrete(pole, Ts, y0)
+
+        lst_log = [ (0, y0) ]
+        for t in T:
+            y = f1d.update([0,0,0])
+            lst_log.append((t, y))
+
+        #.............................................#
+        #---- new figure:
+        fig = 0
+
+        #---- new figure:
+        fig = fig + 1
+
+        f = plt.figure(fig).clf()
+        f, ax = plt.subplots(len(y0),1,num=fig, sharex=True)
+
+        for idx in range(len(y0)):
+            ax[idx].plot([i[0] for i in lst_log], [i[1][idx] for i in lst_log])
+            ax[idx].grid(True)
+            ax[idx].legend((f'y[{idx}]',))
+
+        f.canvas.flush_events()
+        f.canvas.draw() 
+
+        #.............................................#
+        plt.show(block=self.block)
+        #.............................................#
+
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 #>>                                                      >>

@@ -81,45 +81,5 @@ class k1OrderLTIsysMimoDiscrete:
 
         return self.y
 
-#################################
-def fn_example_mimo():
+#>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 
-    import matplotlib.pyplot      as plt
-
-    pole = -10. # pole for the transfer function:
-    tmax = 1.0  # [s]
-    Ts   = 5e-3 # sample rate
-    T    = np.arange(0,tmax, Ts)
-    y0   = [1,2,3]
-    f1d  = k1OrderLTIsysMimoDiscrete(pole, Ts, y0)
-
-    lst_log = [ (0, y0) ]
-    for t in T:
-        y = f1d.update([0,0,0])
-        lst_log.append((t, y))
-
-    #.............................................#
-    #---- new figure:
-    fig = 0
-
-    #---- new figure:
-    fig = fig + 1
-
-    f = plt.figure(fig).clf()
-    f, ax = plt.subplots(len(y0),1,num=fig, sharex=True)
-
-    for idx in range(len(y0)):
-        ax[idx].plot([i[0] for i in lst_log], [i[1][idx] for i in lst_log])
-        ax[idx].grid(True)
-        ax[idx].legend((f'y[{idx}]',))
-
-    f.canvas.flush_events()
-    f.canvas.draw() 
-
-    #.............................................#
-    plt.show(block=False)
-    #.............................................#
-
-#################################
-if __name__ == "__main__":
-    fn_example_mimo()
