@@ -5,7 +5,8 @@ print(f"** __name__    = {__name__}")
 print(f"** __package__ = {__package__}")
 print(f"** sys.path[0] = {sys.path[0]}")
 
-from kltisystems import k1OrderLTIsysSisoContinuous, k1OrderLTIsysSisoDiscrete
+from kltisystems import k2OrderLTIsysSisoFactory
+from kltisystems import k1OrderLTIsysSisoFactory
 from kltisystems import k1OrderLTIsysMimoDiscrete
 from kltisystems import fn_example_siso, fn_example_mimo
 from knavigation import kArray
@@ -39,7 +40,7 @@ class TestClass_1OrderContinuos:
         pole = -2.0
         y0   =  3.0
 
-        f1c = k1OrderLTIsysSisoContinuous(pole, y0)
+        f1c = k1OrderLTIsysSisoFactory(pole, y0)
 
         for t in [0, 0.5, 1, 2]:
             assert abs(f1c.update(t, 1.0) - fn_solution(y0, 1.0, pole, t)) < 1e-7
@@ -54,7 +55,7 @@ class TestClass_1OrderDiscrete:
         y0   = 3.0
         Ts   = 1./1e6 # [s]
 
-        f1d = k1OrderLTIsysSisoDiscrete(pole, Ts, y0)
+        f1d = k1OrderLTIsysSisoFactory(pole, Ts, y0)
 
         for t in np.arange(Ts, 2.0, Ts):
             y = f1d.update(1.0)

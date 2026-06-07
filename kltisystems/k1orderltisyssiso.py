@@ -86,6 +86,26 @@ class k1OrderLTIsysSisoDiscrete:
 
         return self.y
 
+##########################
+## k1Order Siso Factory ##
+##########################
+def k1OrderLTIsysSisoFactory(*args, **kargs):
+
+    Ts = kargs.get('Ts', None)
+
+    # when Ts is defined:
+    if Ts is not None:
+        if Ts > 0:
+            return k1OrderLTIsysSisoDiscrete(*args, **kargs)
+        else:
+            raise NotImplementedError("this is still not implemented")
+    else:
+        # when Ts is positional:
+        if len(args) >= 3:
+            return k1OrderLTIsysSisoDiscrete(*args, **kargs)
+        else:
+            return k1OrderLTIsysSisoContinuous(*args, **kargs)
+
 #################################
 def fn_example_siso():
 
@@ -136,3 +156,4 @@ def fn_example_siso():
 #################################
 if __name__ == "__main__":
     fn_example_siso()
+#################################
