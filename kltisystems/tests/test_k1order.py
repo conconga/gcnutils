@@ -5,7 +5,6 @@ print(f"** __name__    = {__name__}")
 print(f"** __package__ = {__package__}")
 print(f"** sys.path[0] = {sys.path[0]}")
 
-from kltisystems import k2OrderLTIsysSisoFactory
 from kltisystems import k1OrderLTIsysSisoFactory
 from kltisystems import k1OrderLTIsysMimoDiscrete
 from kltisystems import fn_example_siso, fn_example_mimo
