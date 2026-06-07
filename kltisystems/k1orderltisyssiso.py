@@ -98,7 +98,7 @@ def k1OrderLTIsysSisoFactory(*args, **kargs):
         if Ts > 0:
             return k1OrderLTIsysSisoDiscrete(*args, **kargs)
         else:
-            raise NotImplementedError("this is still not implemented")
+            raise NotImplementedError("this will NEVER be implemented!")
     else:
         # when Ts is positional:
         if len(args) >= 3:
