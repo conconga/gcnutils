@@ -14,7 +14,7 @@ GitHub:
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>
 ##WWww=--  import section: --=wwWW##
 import numpy   as np
-from   numpy   import inf
+from   numpy   import inf, pi
 from   .k2orderltisyssiso import k2OrderLTIsysSisoFactory
 
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
@@ -22,7 +22,16 @@ from   .k2orderltisyssiso import k2OrderLTIsysSisoFactory
 #>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>--<<..>>#
 class kCommon2OrderLTIsysMimo:
 
-    def __init__(self, qsi, wn, x0, min_dxdt, max_dxdt, min_x, max_x, Ts=0):
+    def __init__(self,
+                 qsi      = 0.7,
+                 wn       = 2.0 * pi * 10,
+                 x0       = None,
+                 min_dxdt = -inf,
+                 max_dxdt = +inf,
+                 min_x    = -inf,
+                 max_x    = +inf,
+                 Ts       = 0,
+    ):
         """
         parameters:
             qsi : damping factor
