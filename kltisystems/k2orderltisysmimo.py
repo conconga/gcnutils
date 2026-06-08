@@ -78,7 +78,7 @@ class kCommon2OrderLTIsysMimo:
             Out = [In for i in range(self.n)]
 
         elif (isinstance(In, np.ndarray)):
-            Out = In.tolist()
+            Out = In.squeeze().tolist()
 
         elif (isinstance(In, list)):
             Out = In
