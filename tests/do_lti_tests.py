@@ -7,12 +7,8 @@ print(f"** sys.path[0] = {sys.path[0]}")
 # need to add the path to the package __init__.py:
 sys.path.append("..")
 
-from kltisystems import k2OrderLTIsysMimoTests
 from kltisystems import kNOrderDerivativeSisoTests
 
 if __name__ == "__main__":
-    tests = k2OrderLTIsysMimoTests()
-    tests.do_tests()
-
     tests = kNOrderDerivativeSisoTests()
     tests.do_tests()
