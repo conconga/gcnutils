@@ -148,9 +148,9 @@ q_n2b     = euler_n2b.euler2Q()
 vector_n  = kArrayNav([vx, vy, vz], hvector=False)
 
 # either:
-vector_n  = C_n2b * vector_n
+vector_b  = C_n2b * vector_n
 # or:
-vector_n  = q_n2b.q_x_3d(vector_n)
+vector_b  = q_n2b.q_x_3d(vector_n)
 ```
 
 ## to convert to/from quaternions from/to transformation-matrix:
@@ -221,7 +221,7 @@ For example, if `C_a2b` and `C_b2c` are transformation matrices, while the respe
 `q_b2c`, the composition of the transformations are:
 
 ```latex
-C_a2c = C_c2b * C_a2b
+C_a2c = C_b2c * C_a2b
 q_a2c = q_a2b o q_b2c # where 'o' stands for the quaternion multiplication operator, q_x_q().
 ```
 
